@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Meridian Hemp Co — multi-state US hemp flower brokerage. COA-verified lots, landed quotes, insured freight. Wholesale / B2B only.">
+<meta property="og:title" content="Meridian Hemp Co — Multi-State Hemp Flower Brokerage">
+<meta property="og:description" content="Hemp flower brokerage, run like a commodity desk. Every lot COA-verified to the issuing lab's own records.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://meridianhempco.com/">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22"><circle cx="11" cy="11" r="9.5" fill="none" stroke="%231E5C3F" stroke-width="1.6"/><line x1="11" y1="0.5" x2="11" y2="21.5" stroke="%231E5C3F" stroke-width="1.6"/><ellipse cx="11" cy="11" rx="4.5" ry="9.5" fill="none" stroke="%231E5C3F" stroke-width="1"/></svg>'>
+<link rel="canonical" href="https://meridianhempco.com/">
+<title>Meridian Hemp Co — Multi-State Hemp Flower Brokerage</title>
+<style>
+  :root {
+    --paper: #F2F4F0;
+    --ink: #1A241E;
+    --muted: #5C6660;
+    --meridian: #1E5C3F;
+    --brass: #A8894B;
+    --line: #D8DCD6;
+    --card: #FBFCFA;
+    --notice: #EBEFE9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #121815;
+      --ink: #E8ECE7;
+      --muted: #9AA69E;
+      --meridian: #6FBF95;
+      --brass: #C7A96B;
+      --line: #2A332D;
+      --card: #182019;
+      --notice: #1C2620;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #121815;
+    --ink: #E8ECE7;
+    --muted: #9AA69E;
+    --meridian: #6FBF95;
+    --brass: #C7A96B;
+    --line: #2A332D;
+    --card: #182019;
+    --notice: #1C2620;
+  }
+  :root[data-theme="light"] {
+    --paper: #F2F4F0;
+    --ink: #1A241E;
+    --muted: #5C6660;
+    --meridian: #1E5C3F;
+    --brass: #A8894B;
+    --line: #D8DCD6;
+    --card: #FBFCFA;
+    --notice: #EBEFE9;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  .serif { font-family: "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif; }
+  .mono {
+    font-family: Consolas, "SF Mono", ui-monospace, Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  a { color: var(--meridian); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--meridian);
+    outline-offset: 3px;
+  }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- header ---------- */
+  header {
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0;
+    background: var(--paper);
+    z-index: 10;
+  }
+  .bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; padding: 14px 0;
+  }
+  .wordmark {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--ink); font-weight: 600; letter-spacing: 0.08em;
+    font-size: 0.95rem; text-transform: uppercase;
+  }
+  .wordmark:hover { text-decoration: none; }
+  .glyph { width: 22px; height: 22px; flex: none; }
+  nav { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
+  nav a {
+    color: var(--muted); font-size: 0.82rem; letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  nav a:hover { color: var(--meridian); text-decoration: none; }
+  .badge {
+    font-size: 0.7rem; letter-spacing: 0.12em; color: var(--muted);
+    border: 1px solid var(--line); padding: 4px 10px; white-space: nowrap;
+  }
+
+  /* ---------- hero ---------- */
+  .hero {
+    display: grid; grid-template-columns: 1.15fr 0.85fr;
+    gap: 48px; padding: 72px 0 64px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+  .hero::before {
+    content: ""; position: absolute; top: 0; bottom: 0; left: 55%;
+    width: 1px; background: var(--line); opacity: 0.7;
+  }
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; gap: 36px; }
+    .hero::before { display: none; }
+  }
+  .eyebrow {
+    font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--meridian); margin: 0 0 18px;
+  }
+  h1 {
+    font-size: clamp(2rem, 4.6vw, 3.1rem);
+    line-height: 1.12; font-weight: 500; margin: 0 0 20px;
+    text-wrap: balance; letter-spacing: -0.01em;
+  }
+  .lede { color: var(--muted); max-width: 34rem; margin: 0 0 30px; }
+  .cta-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .btn {
+    display: inline-block; background: var(--meridian); color: var(--paper);
+    padding: 12px 22px; font-size: 0.85rem; letter-spacing: 0.08em;
+    text-transform: uppercase; border: 1px solid var(--meridian);
+  }
+  .btn:hover { text-decoration: none; opacity: 0.92; }
+  .btn-quiet {
+    display: inline-block; color: var(--ink); padding: 12px 4px;
+    font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase;
+    border-bottom: 1px solid var(--brass);
+  }
+  .btn-quiet:hover { text-decoration: none; color: var(--meridian); }
+
+  /* ---------- lot ticket ---------- */
+  .ticket {
+    background: var(--card); border: 1px solid var(--line);
+    padding: 22px 24px; font-size: 0.8rem; line-height: 1.7;
+    position: relative; align-self: start;
+  }
+  .ticket-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 14px;
+    letter-spacing: 0.14em; font-size: 0.7rem; color: var(--muted);
+    text-transform: uppercase;
+  }
+  .ticket table { width: 100%; border-collapse: collapse; }
+  .ticket td { padding: 4px 0; vertical-align: top; }
+  .ticket td:first-child {
+    color: var(--muted); width: 38%; letter-spacing: 0.08em;
+    text-transform: uppercase; font-size: 0.68rem; padding-right: 12px;
+  }
+  .stamp {
+    position: absolute; right: 18px; bottom: 16px;
+    border: 2px solid var(--brass); color: var(--brass);
+    padding: 5px 12px; letter-spacing: 0.2em; font-size: 0.72rem;
+    text-transform: uppercase; transform: rotate(-4deg);
+  }
+  .ticket-caption {
+    margin-top: 12px; font-size: 0.78rem; color: var(--muted);
+    font-style: italic;
+  }
+
+  /* ---------- trust bar ---------- */
+  .trust {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border-bottom: 1px solid var(--line);
+  }
+  @media (max-width: 860px) { .trust { grid-template-columns: repeat(2, 1fr); } }
+  .trust div {
+    padding: 20px 18px 22px; border-left: 1px solid var(--line);
+    font-size: 0.78rem; color: var(--muted); line-height: 1.5;
+  }
+  .trust div:first-child { border-left: none; padding-left: 0; }
+  @media (max-width: 860px) {
+    .trust div:nth-child(odd) { border-left: none; padding-left: 0; }
+  }
+  .trust strong {
+    display: block; color: var(--ink); font-size: 0.72rem;
+    letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  /* ---------- sections ---------- */
+  section { padding: 64px 0; border-bottom: 1px solid var(--line); }
+  h2 {
+    font-size: 1.6rem; font-weight: 500; margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .section-note { color: var(--muted); font-size: 0.9rem; margin: 0 0 36px; max-width: 40rem; }
+
+  .supply-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  @media (max-width: 700px) { .supply-grid { grid-template-columns: 1fr; } }
+  .supply-grid article { background: var(--card); padding: 24px; }
+  .supply-grid h3 { margin: 0 0 8px; font-size: 1.05rem; font-weight: 600; }
+  .supply-grid p { margin: 0 0 12px; color: var(--muted); font-size: 0.9rem; }
+  .avail {
+    font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--meridian);
+  }
+  .avail.window { color: var(--brass); }
+
+  .steps { counter-reset: step; display: grid; gap: 0; }
+  .step {
+    display: grid; grid-template-columns: 72px 1fr; gap: 20px;
+    padding: 24px 0; border-top: 1px solid var(--line);
+  }
+  .step:first-of-type { border-top: none; padding-top: 0; }
+  .step-no {
+    color: var(--brass); font-size: 1.4rem; line-height: 1.2;
+  }
+  .step h3 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
+  .step p { margin: 0; color: var(--muted); font-size: 0.9rem; max-width: 44rem; }
+
+  .notice {
+    background: var(--notice); border: 1px solid var(--line);
+    border-left: 3px solid var(--meridian);
+    padding: 28px 30px; max-width: 46rem;
+  }
+  .notice h3 { margin: 0 0 10px; font-size: 1rem; font-weight: 600; letter-spacing: 0.02em; }
+  .notice p { margin: 0 0 12px; font-size: 0.92rem; color: var(--muted); }
+  .notice p:last-child { margin-bottom: 0; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  @media (max-width: 860px) { .split { grid-template-columns: 1fr; } }
+
+  .pending {
+    font-size: 0.75rem; color: var(--brass); letter-spacing: 0.06em;
+  }
+
+  footer { padding: 36px 0 48px; color: var(--muted); font-size: 0.76rem; line-height: 1.8; }
+  footer .wrap { display: flex; flex-direction: column; gap: 4px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero > * { animation: rise 0.6s ease both; }
+    .hero > *:nth-child(2) { animation-delay: 0.12s; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: none; }
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a class="wordmark serif" href="#top">
+      <svg class="glyph" viewBox="0 0 22 22" aria-hidden="true">
+        <circle cx="11" cy="11" r="9.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <line x1="11" y1="0.5" x2="11" y2="21.5" stroke="currentColor" stroke-width="1.4"/>
+        <ellipse cx="11" cy="11" rx="4.5" ry="9.5" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.55"/>
+      </svg>
+      Meridian Hemp Co
+    </a>
+    <nav aria-label="Sections">
+      <a href="#supply">Supply</a>
+      <a href="#process">Process</a>
+      <a href="#compliance">Compliance</a>
+      <a href="#growers">Growers</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <span class="badge mono">B2B · 21+</span>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap">
+
+    <div class="hero">
+      <div>
+        <p class="eyebrow mono">US-Grown · Multi-State Supply · Brokerage</p>
+        <h1 class="serif">Hemp flower brokerage, run like a commodity desk.</h1>
+        <p class="lede">
+          Meridian moves US-grown THCA and CBD flower at wholesale scale — every lot
+          verified to the issuing lab's own records, quoted landed with insured freight,
+          and contracted around the federal compliance calendar. No surprises in the box,
+          on the road, or in November.
+        </p>
+        <div class="cta-row">
+          <a class="btn" href="mailto:deals@meridianhempco.com?subject=Lot%20menu%20request">Request current lot menu</a>
+          <a class="btn-quiet" href="#growers">Supply intake for growers</a>
+        </div>
+      </div>
+
+      <div>
+        <div class="ticket mono" role="img" aria-label="Specimen lot confirmation ticket showing Meridian's verification standard">
+          <div class="ticket-head"><span>Lot Confirmation</span><span>Specimen</span></div>
+          <table>
+            <tr><td>Lot No.</td><td>MHC-26-0714</td></tr>
+            <tr><td>Origin</td><td>US-grown · multi-state</td></tr>
+            <tr><td>Product</td><td>Light-dep flower, hand-trimmed, A-bud</td></tr>
+            <tr><td>Moisture</td><td>≤ 12% per contract spec</td></tr>
+            <tr><td>Total THC</td><td>Δ9 + 0.877 × THCA — compliant per spec</td></tr>
+            <tr><td>COA</td><td>ISO 17025 / DEA-registered lab · QR → LIMS ✓</td></tr>
+            <tr><td>Freight</td><td>Insured · documented · quoted landed</td></tr>
+          </table>
+          <span class="stamp">Verified</span>
+        </div>
+        <p class="ticket-caption">Every Meridian lot ships against a confirmation like this one.</p>
+      </div>
+    </div>
+
+    <div class="trust">
+      <div><strong>Real lab COAs</strong>ISO-17025, DEA-registered labs only. High-LOQ and shopped results rejected at intake.</div>
+      <div><strong>Verified, not trusted</strong>Every COA scanned to the lab's own LIMS server — never taken from a PDF. Large lots independently retested.</div>
+      <div><strong>Landed, insured freight</strong>Hemp-specialized carriers, cargo coverage, full transport documentation riding in the cab.</div>
+      <div><strong>Built for Nov 12</strong>THCA contracts carry sell-through deadlines and sunset clauses. We plan the transition with you, not against you.</div>
+    </div>
+
+    <section id="supply">
+      <h2 class="serif">What we move</h2>
+      <p class="section-note">Wholesale volume for distributors, pre-roll manufacturers, and retail programs in lawful state markets.</p>
+      <div class="supply-grid">
+        <article>
+          <h3>THCA flower</h3>
+          <p>Indoor, light-dep, and outdoor tiers; A-buds and smalls. Brokered with sell-through timelines through the federal window.</p>
+          <span class="avail window mono">Available — window pricing</span>
+        </article>
+        <article>
+          <h3>CBD flower</h3>
+          <p>Genuinely ≤0.3% total THC — the shelf that survives November. Rising demand, four consecutive months of price gains.</p>
+          <span class="avail mono">Available — durable line</span>
+        </article>
+        <article>
+          <h3>Pre-roll grade &amp; smalls</h3>
+          <p>Volume supply for manufacturers. One pound converts to 200–250 finished units — we keep your line fed on schedule.</p>
+          <span class="avail mono">Available — recurring lanes</span>
+        </article>
+        <article>
+          <h3>Biomass &amp; off-grade</h3>
+          <p>Extraction-bound material, graded straight. The sample photo matches the lot, or the lot doesn't ship.</p>
+          <span class="avail mono">Available — by intake</span>
+        </article>
+      </div>
+    </section>
+
+    <section id="process">
+      <h2 class="serif">How a Meridian deal runs</h2>
+      <p class="section-note">Four steps, in order, every time. The discipline is the product.</p>
+      <div class="steps">
+        <div class="step">
+          <span class="step-no serif">1</span>
+          <div>
+            <h3>Intake &amp; grading</h3>
+            <p>Strain, grade, grow method, moisture, harvest date, seller licensing — logged before anything is offered. We verify counterparties against public license registries.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-no serif">2</span>
+          <div>
+            <h3>COA verification</h3>
+            <p>Lot-specific COA from an ISO-17025 / DEA-registered lab, QR-scanned to the lab's own records. Implausible profiles and high-LOQ reports are rejected; large lots are independently retested.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-no serif">3</span>
+          <div>
+            <h3>Landed quote</h3>
+            <p>Insured, hemp-specialized freight with the full document packet in the cab — COAs, licenses, invoice, bill of lading. Routed around hostile corridors. One number: landed.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-no serif">4</span>
+          <div>
+            <h3>Contract &amp; sell-through</h3>
+            <p>Specs as conditions, failed-COA remedies, defined risk of loss — and on THCA, sell-through deadlines with November sunset clauses. Signed before shipment, honored after it.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="compliance">
+      <h2 class="serif">Compliance position</h2>
+      <p class="section-note">The straight version, because our buyers ask — and should.</p>
+      <div class="notice">
+        <h3>About November 12, 2026</h3>
+        <p>
+          Federal law redefines hemp on November 12, 2026 to a total-THC standard that
+          includes THCA. We broker THCA flower only in states where it is lawful today,
+          only with contracts structured to complete sell-through ahead of the deadline,
+          and we are actively shifting supply weight to compliant CBD flower and
+          pre-roll programs that continue after the transition.
+        </p>
+        <p>
+          We operate through public, state-lawful channels, verify counterparty licensing,
+          and paper every load for interstate transport. We are brokers, not lawyers —
+          nothing on this page is legal advice, and we encourage every counterparty to
+          take their own counsel.
+        </p>
+      </div>
+    </section>
+
+    <section id="growers">
+      <div class="split">
+        <div>
+          <h2 class="serif">Holding supply? We place it.</h2>
+          <p class="section-note" style="margin-bottom:20px">
+            If you're a licensed grower with US-grown flower at scale, Meridian brokers it
+            into a verified network of distributors, pre-roll manufacturers, and retail
+            programs. Commission terms, non-circumvention protection in both directions,
+            and grading you won't have to argue about later.
+          </p>
+          <a class="btn-quiet" href="mailto:deals@meridianhempco.com?subject=Supply%20intake">Start supply intake</a>
+        </div>
+        <div>
+          <h2 class="serif">Buying for a program?</h2>
+          <p class="section-note" style="margin-bottom:20px">
+            Distributors and manufacturers get a current lot menu, COA packs up front,
+            samples on request, and restock capacity single farms can't hold. Tell us
+            your spec — grade, volume, cadence, destination states — and we'll quote landed.
+          </p>
+          <a class="btn-quiet" href="mailto:deals@meridianhempco.com?subject=Buyer%20spec">Send your spec</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" style="border-bottom:none">
+      <h2 class="serif">Contact the desk</h2>
+      <p class="section-note">
+        One address for buyers and growers — subject lines route it.
+      </p>
+      <div class="cta-row">
+        <a class="btn" href="mailto:deals@meridianhempco.com?subject=Lot%20menu%20request">deals@meridianhempco.com</a>
+        <span class="pending mono">Domain email activating — replies may route through our intake during setup.</span>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Meridian Hemp Co. Wholesale / B2B only. 21+.</span>
+    <span>All products brokered as hemp as defined by applicable federal and state law. Serving lawful state markets only.</span>
+    <span>Nothing on this site is legal, financial, or medical advice.</span>
+  </div>
+</footer>
+</body>
+</html>
