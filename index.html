@@ -10,6 +10,31 @@
 <meta property="og:url" content="https://meridianhempco.com/">
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22"><circle cx="11" cy="11" r="9.5" fill="none" stroke="%231E5C3F" stroke-width="1.6"/><line x1="11" y1="0.5" x2="11" y2="21.5" stroke="%231E5C3F" stroke-width="1.6"/><ellipse cx="11" cy="11" rx="4.5" ry="9.5" fill="none" stroke="%231E5C3F" stroke-width="1"/></svg>'>
 <link rel="canonical" href="https://meridianhempco.com/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Meridian Hemp Co",
+  "url": "https://meridianhempco.com/",
+  "email": "deals@meridianhempco.com",
+  "description": "Multi-state US hemp flower brokerage. COA-verified lots, landed quotes, insured freight. Wholesale / B2B only.",
+  "foundingDate": "2026",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "312 W. 2nd St #1175",
+    "addressLocality": "Casper",
+    "addressRegion": "WY",
+    "postalCode": "82601",
+    "addressCountry": "US"
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": "deals@meridianhempco.com",
+    "contactType": "sales",
+    "areaServed": "US"
+  }
+}
+</script>
 <title>Meridian Hemp Co — Multi-State Hemp Flower Brokerage</title>
 <style>
   :root {
@@ -243,6 +268,31 @@
     font-size: 0.75rem; color: var(--brass); letter-spacing: 0.06em;
   }
 
+  /* ---------- contact form ---------- */
+  .contact-form { max-width: 46rem; margin-top: 36px; display: grid; gap: 18px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 700px) { .form-row { grid-template-columns: 1fr; } }
+  .field label {
+    display: block; font-family: Consolas, "SF Mono", ui-monospace, Menlo, monospace;
+    font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px;
+  }
+  .field input, .field textarea {
+    width: 100%; background: var(--card); border: 1px solid var(--line);
+    color: var(--ink); font: inherit; font-size: 0.92rem; padding: 11px 12px;
+  }
+  .field input:focus, .field textarea:focus {
+    outline: none; border-color: var(--meridian);
+  }
+  .field textarea { min-height: 110px; resize: vertical; }
+  button.btn { font: inherit; font-size: 0.85rem; cursor: pointer; }
+  .form-note { font-size: 0.78rem; color: var(--muted); margin: 0; }
+  .sent-note {
+    display: none; background: var(--notice); border-left: 3px solid var(--meridian);
+    padding: 14px 18px; font-size: 0.9rem; margin-top: 20px; max-width: 46rem;
+  }
+  .honey { display: none !important; }
+
   footer { padding: 36px 0 48px; color: var(--muted); font-size: 0.76rem; line-height: 1.8; }
   footer .wrap { display: flex; flex-direction: column; gap: 4px; }
 
@@ -436,9 +486,49 @@
         One address for buyers and growers — subject lines route it.
       </p>
       <div class="cta-row">
-        <a class="btn" href="mailto:deals@meridianhempco.com?subject=Lot%20menu%20request">deals@meridianhempco.com</a>
+        <a class="btn-quiet" href="mailto:deals@meridianhempco.com?subject=Lot%20menu%20request">deals@meridianhempco.com</a>
         <span class="pending mono">Response within one business day.</span>
       </div>
+
+      <div class="sent-note" id="sent-note">
+        Received — the desk will reply within one business day.
+      </div>
+
+      <form class="contact-form" action="https://formsubmit.co/deals@meridianhempco.com" method="POST">
+        <input type="hidden" name="_subject" value="Website inquiry — meridianhempco.com">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value="https://meridianhempco.com/?sent=1#contact">
+        <input type="text" name="_honey" class="honey" tabindex="-1" autocomplete="off">
+        <div class="form-row">
+          <div class="field">
+            <label for="f-name">Name</label>
+            <input id="f-name" type="text" name="name" required autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="f-company">Company</label>
+            <input id="f-company" type="text" name="company" required autocomplete="organization">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="f-email">Work email</label>
+            <input id="f-email" type="email" name="email" required autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="f-role">I am a</label>
+            <input id="f-role" type="text" name="role" placeholder="Buyer / Grower / Other" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-message">Spec or inquiry — grade, volume, cadence, destination states</label>
+          <textarea id="f-message" name="message" required></textarea>
+        </div>
+        <div class="cta-row">
+          <button class="btn" type="submit">Send to the desk</button>
+          <p class="form-note">Wholesale / B2B only. No consumer sales.</p>
+        </div>
+      </form>
     </section>
 
   </div>
@@ -452,5 +542,12 @@
     <span>Nothing on this site is legal, financial, or medical advice.</span>
   </div>
 </footer>
+
+<script>
+  if (new URLSearchParams(location.search).has('sent')) {
+    document.getElementById('sent-note').style.display = 'block';
+    history.replaceState(null, '', '/#contact');
+  }
+</script>
 </body>
 </html>
