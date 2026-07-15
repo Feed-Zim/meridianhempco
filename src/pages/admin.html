@@ -1,0 +1,60 @@
+<main id="main" class="admin-app">
+
+  <div id="admin-unconfigured" class="admin-notice" hidden>
+    <div class="wrap">
+      <p>Supabase config pending — see supabase/config-notes.md</p>
+    </div>
+  </div>
+
+  <section id="admin-login" class="admin-login" hidden>
+    <div class="wrap admin-login-wrap">
+      <form id="admin-login-form" class="form-card admin-login-card" novalidate>
+        <h1>Desk admin</h1>
+        <div class="field">
+          <label for="admin-email">Email</label>
+          <input id="admin-email" name="email" type="email" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="admin-password">Password</label>
+          <input id="admin-password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <p id="admin-login-error" class="form-error" role="alert" hidden></p>
+        <div class="form-actions">
+          <button class="btn" type="submit">Sign in</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <div id="admin-shell" class="admin-shell" hidden>
+    <div class="admin-topbar">
+      <div class="wrap admin-topbar-inner">
+        <h1 class="admin-title">Desk admin</h1>
+        <div class="admin-topbar-right">
+          <span id="admin-user-email" class="mono admin-user-email"></span>
+          <button id="admin-signout" class="btn-quiet" type="button">Sign out</button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="admin-tabs wrap" aria-label="Admin sections">
+      <button class="admin-tab" type="button" data-tab="intake">Intake</button>
+      <button class="admin-tab" type="button" data-tab="requests">Requests</button>
+      <button class="admin-tab" type="button" data-tab="farms">Farms</button>
+      <button class="admin-tab" type="button" data-tab="lots">Lots</button>
+      <button class="admin-tab" type="button" data-tab="buyers">Buyers</button>
+      <button class="admin-tab" type="button" data-tab="deals">Deals</button>
+      <button class="admin-tab" type="button" data-tab="activity">Activity</button>
+    </nav>
+
+    <p id="admin-flash" class="admin-flash" role="status" hidden></p>
+
+    <div class="wrap admin-view-wrap">
+      <div id="admin-view" class="admin-view"></div>
+    </div>
+  </div>
+
+</main>
+<script defer src="/assets/js/vendor/supabase.min.js"></script>
+<script type="module" src="/assets/js/admin.js"></script>
+<script type="module" src="/assets/js/offer-sheet.js"></script>

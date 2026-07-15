@@ -1,0 +1,99 @@
+{
+  "$comment": "Per-route metadata for build.mjs. Only the Home route is final in Phase 1; the other four are scaffolded placeholders to be finalized in Phase 3.",
+  "site": {
+    "name": "Meridian Hemp Co",
+    "origin": "https://meridianhempco.com",
+    "ogImage": "https://meridianhempco.com/assets/img/og-default.jpg",
+    "twitterCard": "summary_large_image"
+  },
+  "routes": {
+    "index": {
+      "path": "/",
+      "output": "index.html",
+      "nav": "home",
+      "title": "Meridian Hemp Co — A dedicated broker for wholesale hemp flower",
+      "description": "US-grown CBD hemp flower at wholesale. Every lab report checked against the lab's own records, quotes landed with insured freight, contracts written for the Nov 12, 2026 rule. Wholesale / B2B only.",
+      "canonical": "https://meridianhempco.com/",
+      "ogTitle": "Meridian Hemp Co — A dedicated broker for wholesale hemp flower",
+      "ogDescription": "Growers list their flower. I check every COA against the lab's own records, quote it delivered with insured freight, and handle the paperwork."
+    },
+    "how-it-works": {
+      "path": "/how-it-works/",
+      "output": "how-it-works/index.html",
+      "nav": "how-it-works",
+      "title": "How it works — Meridian Hemp Co",
+      "description": "From the grower's barn to your dock: intake and grading, COA verification, a landed quote with insured freight, then contract and delivery.",
+      "canonical": "https://meridianhempco.com/how-it-works/",
+      "ogTitle": "How it works — Meridian Hemp Co",
+      "ogDescription": "The four plain steps every Meridian deal follows, and what a broker adds to the deal."
+    },
+    "lots": {
+      "path": "/lots/",
+      "output": "lots/index.html",
+      "nav": "lots",
+      "title": "Current lots — Meridian Hemp Co",
+      "description": "Live wholesale CBD hemp flower inventory, shared by request. Strain, grow type, CBD%, total THC%, trim, pounds, and landed price per pound.",
+      "canonical": "https://meridianhempco.com/lots/",
+      "ogTitle": "Current lots — Meridian Hemp Co",
+      "ogDescription": "Live inventory changes fast, so I share the current lot menu by request."
+    },
+    "compliance": {
+      "path": "/compliance/",
+      "output": "compliance/index.html",
+      "nav": "compliance",
+      "title": "Compliance, in plain English — Meridian Hemp Co",
+      "description": "What hemp legally means, the November 12, 2026 total-THC change, why we broker CBD flower only, and how QR-to-LIMS COA verification works.",
+      "canonical": "https://meridianhempco.com/compliance/",
+      "ogTitle": "Compliance, in plain English — Meridian Hemp Co",
+      "ogDescription": "On November 12, 2026, federal law starts measuring total THC. CBD flower qualifies — which is the only thing we broker."
+    },
+    "contact": {
+      "path": "/contact/",
+      "output": "contact/index.html",
+      "nav": "contact",
+      "title": "Contact the desk — Meridian Hemp Co",
+      "description": "One desk for buyers and growers. Tell us your spec — grade, volume, cadence, destination states — and we reply within one business day.",
+      "canonical": "https://meridianhempco.com/contact/",
+      "ogTitle": "Contact the desk — Meridian Hemp Co",
+      "ogDescription": "One desk for buyers and growers. We reply within one business day."
+    },
+    "request": {
+      "path": "/request/",
+      "output": "request/index.html",
+      "nav": "request",
+      "title": "Request material — Meridian Hemp Co",
+      "description": "Spec the wholesale CBD hemp flower you need — grade, volume, price target, destination — and get a verified, COA-backed offer within one business day.",
+      "canonical": "https://meridianhempco.com/request/",
+      "ogTitle": "Request material — Meridian Hemp Co",
+      "ogDescription": "Tell the desk your spec. A verified, COA-backed offer comes back within one business day."
+    },
+    "growers": {
+      "path": "/growers/",
+      "output": "growers/index.html",
+      "nav": "growers",
+      "title": "For growers — Meridian Hemp Co",
+      "description": "Licensed hemp farms: introduce your lots to the desk. License and COA verified before anything is offered, and your farm identity stays protected.",
+      "canonical": "https://meridianhempco.com/growers/",
+      "ogTitle": "For growers — Meridian Hemp Co",
+      "ogDescription": "Introduce your lots. License and COA verified, your farm's name stays off the table."
+    },
+    "admin": {
+      "path": "/admin/",
+      "output": "admin/index.html",
+      "nav": "admin",
+      "title": "Desk admin — Meridian Hemp Co",
+      "description": "Internal.",
+      "canonical": "https://meridianhempco.com/admin/",
+      "robots": "noindex,nofollow"
+    },
+    "404": {
+      "path": "/404.html",
+      "output": "404.html",
+      "nav": "none",
+      "title": "Page not found — Meridian Hemp Co",
+      "description": "That page doesn't exist — but the desk is still here.",
+      "canonical": "https://meridianhempco.com/404.html",
+      "robots": "noindex,follow"
+    }
+  }
+}

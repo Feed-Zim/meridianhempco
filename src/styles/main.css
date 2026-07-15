@@ -884,7 +884,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .admin-note-form { margin-bottom: 20px; }
 
 /* status badges */
-.badge-ok, .badge-warn, .badge-bad {
+.badge-ok, .badge-warn, .badge-bad, .badge-neutral {
   display: inline-flex; align-items: center; font-family: var(--font-mono);
   font-size: var(--step--2); letter-spacing: 0.04em; padding: 3px 9px;
   border-radius: 999px; border: 1px solid transparent; white-space: nowrap;
@@ -892,6 +892,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .badge-ok { color: var(--meridian); background: var(--sage-fill); border-color: var(--sage); }
 .badge-warn { color: var(--brass); background: color-mix(in srgb, var(--brass) 14%, var(--surface)); border-color: var(--brass-soft); }
 .badge-bad { color: var(--danger); background: var(--danger-fill); border-color: var(--danger); }
+.badge-neutral { color: var(--muted); background: color-mix(in srgb, var(--muted) 10%, var(--surface)); border-color: color-mix(in srgb, var(--muted) 35%, transparent); }
 
 @media (max-width: 700px) {
   .admin-topbar-inner { flex-direction: column; align-items: flex-start; gap: 8px; }

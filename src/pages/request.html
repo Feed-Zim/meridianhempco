@@ -1,0 +1,113 @@
+<main id="main">
+
+  <section class="page-intro">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">For buyers</p>
+        <h1>Tell the desk what you need.</h1>
+        <p class="lead">Spec out what you're after — grade, volume, price target, and where it's headed. I check your request against the lots on the desk and reply with a verified, COA-backed offer. Response within one business day.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="form-section">
+    <div class="wrap">
+      <!-- action/method = native no-JS fallback straight to the email relay;
+           with JS active, forms.js preventDefaults and handles submission. -->
+      <form class="form-card" data-form="buyer-request" novalidate
+            action="https://formsubmit.co/deals@meridianhempco.com" method="POST">
+        <input type="hidden" name="_subject" value="New buyer request (via site form)">
+        <input type="hidden" name="_next" value="https://meridianhempco.com/request/?sent=1">
+        <noscript><p class="form-note">JavaScript is off — the form still submits by email, or write to deals@meridianhempco.com directly. State fields below need JavaScript; mention your state in the message instead.</p></noscript>
+        <div class="form-grid">
+
+          <h2 class="form-legend">Who you are</h2>
+
+          <div class="field">
+            <label for="br-company">Company</label>
+            <input id="br-company" name="company" type="text" autocomplete="organization">
+          </div>
+          <div class="field">
+            <label for="br-contact-name">Your name <span class="req">*</span></label>
+            <input id="br-contact-name" name="contact_name" type="text" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="br-email">Email <span class="req">*</span></label>
+            <input id="br-email" name="contact_email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="br-phone">Phone</label>
+            <input id="br-phone" name="contact_phone" type="tel" autocomplete="tel">
+          </div>
+          <div class="field">
+            <label for="br-state">Your state</label>
+            <select id="br-state" name="state" data-states="Select a state"></select>
+          </div>
+          <div class="field">
+            <label for="br-license">License #</label>
+            <input id="br-license" name="license" type="text">
+            <p class="field-hint">Resale or state program license, if applicable.</p>
+          </div>
+
+          <h2 class="form-legend">What you need</h2>
+
+          <div class="field">
+            <label for="br-material">Material <span class="req">*</span></label>
+            <select id="br-material" name="material_type" required>
+              <option value="">Select one</option>
+              <option value="cbd_flower">CBD flower</option>
+              <option value="smalls">Smalls / pre-roll grade</option>
+              <option value="biomass">Biomass</option>
+              <option value="pre_rolls">Finished pre-rolls</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="br-volume">Volume (lb) <span class="req">*</span></label>
+            <input id="br-volume" name="volume_lb" type="number" min="1" step="1" inputmode="numeric" required>
+          </div>
+          <div class="field">
+            <label for="br-price">Price target ($/lb)</label>
+            <input id="br-price" name="price_target_per_lb" type="number" min="0" step="0.01" inputmode="decimal">
+            <p class="field-hint">Optional — helps me shortlist the right lots.</p>
+          </div>
+          <div class="field">
+            <label for="br-destination">Destination state <span class="req">*</span></label>
+            <select id="br-destination" name="destination_state" data-states="Where it ships" required></select>
+          </div>
+          <div class="field">
+            <label for="br-timeline">Timeline</label>
+            <select id="br-timeline" name="timeline">
+              <option value="">Select one</option>
+              <option value="asap">As soon as possible</option>
+              <option value="2-4_weeks">2–4 weeks</option>
+              <option value="recurring">Recurring / monthly</option>
+              <option value="exploring">Just exploring</option>
+            </select>
+          </div>
+          <div class="field field-span">
+            <label for="br-specs">Spec details</label>
+            <textarea id="br-specs" name="specs" placeholder="Strain preference, CBD % target, trim, appearance…"></textarea>
+          </div>
+          <div class="field field-span">
+            <label for="br-message">Anything else</label>
+            <textarea id="br-message" name="message"></textarea>
+          </div>
+
+          <div class="field hp-field" aria-hidden="true">
+            <label for="br-hp">Leave this field empty</label>
+            <input id="br-hp" name="hp" type="text" tabindex="-1" autocomplete="off">
+          </div>
+
+          <div class="form-actions">
+            <button class="btn" type="submit">Send the request</button>
+            <p class="form-note">Wholesale / B2B only. Your request goes straight to the founder and is never shared.</p>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </section>
+
+</main>
+<script defer src="/assets/js/vendor/supabase.min.js"></script>
+<script type="module" src="/assets/js/forms.js"></script>

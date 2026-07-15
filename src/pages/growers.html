@@ -1,0 +1,111 @@
+<main id="main">
+
+  <section class="page-intro">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">For growers</p>
+        <h1>Put your harvest on the desk.</h1>
+        <p class="lead">Introduce your farm and what you're holding. I verify your license and your COA before anything is offered — and your farm's name stays off the table. Buyers deal with Meridian, not with you, unless you choose otherwise.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="form-section">
+    <div class="wrap">
+      <!-- action/method = native no-JS fallback straight to the email relay;
+           with JS active, forms.js preventDefaults and handles submission. -->
+      <form class="form-card" data-form="farm-intake" novalidate
+            action="https://formsubmit.co/deals@meridianhempco.com" method="POST">
+        <input type="hidden" name="_subject" value="New farm intake (via site form)">
+        <input type="hidden" name="_next" value="https://meridianhempco.com/growers/?sent=1">
+        <noscript><p class="form-note">JavaScript is off — the form still submits by email, or write to deals@meridianhempco.com directly. The state dropdown needs JavaScript; mention your state in the message instead.</p></noscript>
+        <div class="form-grid">
+
+          <h2 class="form-legend">Your operation</h2>
+
+          <div class="field">
+            <label for="fi-legal-name">Legal business name <span class="req">*</span></label>
+            <input id="fi-legal-name" name="legal_name" type="text" autocomplete="organization" required>
+          </div>
+          <div class="field">
+            <label for="fi-dba">DBA / farm name</label>
+            <input id="fi-dba" name="dba" type="text">
+          </div>
+          <div class="field">
+            <label for="fi-state">State <span class="req">*</span></label>
+            <select id="fi-state" name="state" data-states="Select a state" required></select>
+          </div>
+          <div class="field">
+            <label for="fi-contact-name">Contact name <span class="req">*</span></label>
+            <input id="fi-contact-name" name="contact_name" type="text" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="fi-email">Email <span class="req">*</span></label>
+            <input id="fi-email" name="contact_email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="fi-phone">Phone</label>
+            <input id="fi-phone" name="contact_phone" type="tel" autocomplete="tel">
+          </div>
+
+          <h2 class="form-legend">License &amp; capacity</h2>
+
+          <div class="field">
+            <label for="fi-license-type">License type</label>
+            <select id="fi-license-type" name="license_type">
+              <option value="">Select one</option>
+              <option value="usda">USDA producer license</option>
+              <option value="state">State program license</option>
+              <option value="unknown">Not sure</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fi-license-number">License #</label>
+            <input id="fi-license-number" name="license_number" type="text">
+            <p class="field-hint">Checked against the USDA / state registry before any lot is offered.</p>
+          </div>
+          <div class="field">
+            <label for="fi-capacity">Annual capacity (lb/yr)</label>
+            <input id="fi-capacity" name="annual_capacity_lb" type="number" min="0" step="1" inputmode="numeric">
+            <p class="field-hint">A rough figure is fine.</p>
+          </div>
+
+          <h2 class="form-legend">What you're holding</h2>
+
+          <div class="field field-span">
+            <span class="check-label" id="fi-materials-label" style="font-weight:600;font-size:var(--step--1)">Material types</span>
+            <div class="check-group" role="group" aria-labelledby="fi-materials-label">
+              <label class="check-option"><input type="checkbox" name="material_types" value="cbd_flower"> CBD flower</label>
+              <label class="check-option"><input type="checkbox" name="material_types" value="smalls"> Smalls / pre-roll grade</label>
+              <label class="check-option"><input type="checkbox" name="material_types" value="biomass"> Biomass</label>
+              <label class="check-option"><input type="checkbox" name="material_types" value="pre_rolls"> Finished pre-rolls</label>
+            </div>
+          </div>
+          <div class="field field-span">
+            <label for="fi-coa">Link to a recent COA</label>
+            <input id="fi-coa" name="coa_link" type="url" placeholder="https://…">
+            <p class="field-hint">Or email the PDF to deals@meridianhempco.com — every lot needs a current lab report before it's offered.</p>
+          </div>
+          <div class="field field-span">
+            <label for="fi-message">Anything else</label>
+            <textarea id="fi-message" name="message" placeholder="Strains, harvest timing, price expectations…"></textarea>
+          </div>
+
+          <div class="field hp-field" aria-hidden="true">
+            <label for="fi-hp">Leave this field empty</label>
+            <input id="fi-hp" name="hp" type="text" tabindex="-1" autocomplete="off">
+          </div>
+
+          <div class="form-actions">
+            <button class="btn" type="submit">Introduce your farm</button>
+            <p class="form-note">Your details are used to verify and match — never shown to buyers.</p>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </section>
+
+</main>
+<script defer src="/assets/js/vendor/supabase.min.js"></script>
+<script type="module" src="/assets/js/forms.js"></script>

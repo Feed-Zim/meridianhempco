@@ -1,0 +1,9 @@
+{
+  "name": "meridianhempco",
+  "private": true,
+  "type": "module",
+  "description": "meridianhempco.com — static site source. `npm run build` assembles dist/ from src/ + page-meta.json.",
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  }
+}
