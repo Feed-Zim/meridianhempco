@@ -80,9 +80,19 @@ create policy anon_insert_new
 -- No select grants and no select policies for anon anywhere in this schema.
 
 -- -----------------------------------------------------------------------------
+-- Function EXECUTE: Postgres grants EXECUTE to PUBLIC by default (unlike tables,
+-- which default-deny). Strip that so anon can call nothing, then re-grant only
+-- to authenticated. anon never needs any meridian function — the anon INSERT
+-- policies check status literals, not is_admin(); trigger functions fire on DML
+-- regardless of the invoking role's EXECUTE privilege.
+-- -----------------------------------------------------------------------------
+revoke execute on all functions in schema meridian from public, anon;
+
+-- -----------------------------------------------------------------------------
 -- authenticated: full CRUD, gated entirely by meridian.is_admin().
 -- -----------------------------------------------------------------------------
 grant select, insert, update, delete on all tables in schema meridian to authenticated;
+grant execute on all functions in schema meridian to authenticated;
 
 drop policy if exists admin_all on meridian.admin_user;
 create policy admin_all
