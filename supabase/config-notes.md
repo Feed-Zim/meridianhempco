@@ -1,5 +1,18 @@
 # Meridian Hemp Co. — Supabase setup (Phase 0)
 
+> **STATUS: COMPLETED 2026-07-15** (except MARK ②/③ — admin login + allowlist row).
+> Project: `meridian-hemp`, ref `shujrqtvwdeqldbizgnk`, region `us-west-1`,
+> org "Feed-Zim's Org" (free plan). Migrations 0001→0004 applied; `meridian`
+> exposed in PostgREST; signups disabled; `coa-private` bucket created (Private);
+> anon key wired into `src/assets/js/supabase-config.js` and deployed via CI.
+> RLS verification suite: all security checks passed (anon denied everywhere,
+> forged status rejected, throwaway non-admin saw zero rows, throwaway admin had
+> full CRUD, bucket admin-only); all test artifacts deleted afterward.
+> Executed via the Supabase Management API directly (PAT from `research/.env`) —
+> the hosted MCP wasn't connected in the session; same PAT, same effect.
+> Note: free-plan projects pause after ~1 week of inactivity — the weekly
+> backup ping below keeps it warm, or upgrade before real deal flow.
+
 **Decision (2026-07-14):** this app gets its own **dedicated Supabase project** —
 NOT the shared org project `cepqtbfocqjrngfjornf`. Supplier/buyer PII and COA
 files stay isolated from every other project's keys and tooling.
