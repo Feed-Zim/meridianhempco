@@ -79,7 +79,7 @@ function flash(msg, isError = false) {
   flashTimer = setTimeout(() => { el.hidden = true; }, 6000);
 }
 
-// Signed-in admin's auth uid — set/cleared by toggleSession(). Stamped onto
+// Signed-in admin's auth uid — set/cleared by applyAuthState(). Stamped onto
 // every activity insert and every reviewed_by column write.
 let currentUserId = null;
 
@@ -153,11 +153,15 @@ function exportCsv(filename, rows) {
 }
 
 // ---------------------------------------------------------------------
-// bootstrap / auth
+// bootstrap / auth (AAL-aware: password sign-in, then TOTP step-up whenever
+// a verified factor exists — enforced server-side by meridian.is_admin(),
+// see supabase/migrations/0005_mfa_aal.sql)
 // ---------------------------------------------------------------------
 const unconfiguredEl = $('#admin-unconfigured');
 const loginEl = $('#admin-login');
+const mfaEl = $('#admin-mfa');
 const shellEl = $('#admin-shell');
+const securityEl = $('#admin-security');
 
 if (!isConfigured()) {
   unconfiguredEl.hidden = false;
@@ -167,32 +171,64 @@ if (!isConfigured()) {
 
 async function init() {
   wireLogin();
+  wireMfa();
   wireShell();
 
-  const { data, error } = await supabase.auth.getSession();
-  if (error) flash(error.message, true);
-  toggleSession(data ? data.session : null);
+  await applyAuthState();
 
-  supabase.auth.onAuthStateChange((_event, session) => {
-    toggleSession(session);
+  // Defer inside the callback: calling supabase auth methods synchronously from
+  // an onAuthStateChange handler can deadlock the client's internal lock.
+  supabase.auth.onAuthStateChange(() => {
+    setTimeout(() => { applyAuthState(); }, 0);
   });
 }
 
+// Shows exactly one of the three top-level auth panels.
+function showAuthPanel(which) {
+  loginEl.hidden = which !== 'login';
+  mfaEl.hidden = which !== 'mfa';
+  shellEl.hidden = which !== 'shell';
+}
+
+// Single source of truth for what the user sees. Consults the session AND its
+// assurance level: a password-only (AAL1) session belonging to an admin who has
+// a verified TOTP factor is routed to the step-up challenge, not the shell —
+// mirroring what RLS enforces server-side, so the shell never shows a session
+// that would only see empty/denied tables.
 let sessionActive = false;
-function toggleSession(session) {
-  if (session) {
-    loginEl.hidden = true;
-    shellEl.hidden = false;
-    $('#admin-user-email').textContent = session.user.email || '';
-    currentUserId = session.user.id;
-    if (!sessionActive) activateTab('intake');
-    sessionActive = true;
-  } else {
-    loginEl.hidden = false;
-    shellEl.hidden = true;
+async function applyAuthState() {
+  const { data: sessData } = await supabase.auth.getSession();
+  const session = sessData ? sessData.session : null;
+
+  if (!session) {
+    showAuthPanel('login');
     sessionActive = false;
     currentUserId = null;
+    closeSecurityPanel();
+    return;
   }
+
+  let needsStepUp = false;
+  try {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aal && aal.nextLevel === 'aal2' && aal.currentLevel !== 'aal2') needsStepUp = true;
+  } catch (_) {
+    // If AAL can't be read, fall through to the shell — RLS is the real gate,
+    // so a misjudgment here is a UX blip, never data exposure.
+  }
+
+  if (needsStepUp) {
+    sessionActive = false;
+    currentUserId = null;
+    await beginMfaChallenge();
+    return;
+  }
+
+  showAuthPanel('shell');
+  $('#admin-user-email').textContent = session.user.email || '';
+  currentUserId = session.user.id;
+  if (!sessionActive) activateTab('intake');
+  sessionActive = true;
 }
 
 function wireLogin() {
@@ -215,7 +251,215 @@ function wireLogin() {
       return;
     }
     form.reset();
+    // onAuthStateChange → applyAuthState() decides shell vs. step-up challenge.
   });
+}
+
+// --- step-up TOTP challenge at sign-in -------------------------------------
+let mfaChallengeFactorId = null;
+
+async function beginMfaChallenge() {
+  showAuthPanel('mfa');
+  const codeInput = $('#admin-mfa-code');
+  const errEl = $('#admin-mfa-error');
+  errEl.hidden = true;
+  if (codeInput) codeInput.value = '';
+  try {
+    const { data, error } = await supabase.auth.mfa.listFactors();
+    if (error) throw error;
+    const totp = (data.totp || []).find((f) => f.status === 'verified') || (data.totp || [])[0];
+    if (!totp) throw new Error('No authenticator is enrolled on this account.');
+    mfaChallengeFactorId = totp.id;
+    if (codeInput && codeInput.focus) codeInput.focus();
+  } catch (e) {
+    errEl.textContent = (e && e.message) || 'Could not start verification.';
+    errEl.hidden = false;
+  }
+}
+
+function wireMfa() {
+  const form = $('#admin-mfa-form');
+  const errEl = $('#admin-mfa-error');
+  const codeInput = $('#admin-mfa-code');
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    errEl.hidden = true;
+    const code = (codeInput.value || '').trim();
+    if (!/^\d{6}$/.test(code)) {
+      errEl.textContent = 'Enter the 6-digit code.';
+      errEl.hidden = false;
+      return;
+    }
+    const btn = form.querySelector('[type="submit"]');
+    const label = btn.textContent;
+    await withBusy(btn, async () => {
+      btn.textContent = 'Verifying…';
+      try {
+        if (!mfaChallengeFactorId) throw new Error('No authenticator is enrolled.');
+        // A fresh challenge per attempt sidesteps the ~5-minute challenge expiry.
+        const { data: chal, error: cerr } = await supabase.auth.mfa.challenge({ factorId: mfaChallengeFactorId });
+        if (cerr) throw cerr;
+        const { error: verr } = await supabase.auth.mfa.verify({
+          factorId: mfaChallengeFactorId, challengeId: chal.id, code,
+        });
+        if (verr) throw verr;
+        codeInput.value = '';
+        // Success elevates the session to AAL2 → onAuthStateChange → shell.
+      } catch (e) {
+        errEl.textContent = (e && e.message) || 'That code was not accepted.';
+        errEl.hidden = false;
+      } finally {
+        btn.textContent = label;
+      }
+    });
+  });
+  $('#admin-mfa-cancel').addEventListener('click', async () => {
+    await supabase.auth.signOut();
+  });
+}
+
+// --- security panel: enroll / disable TOTP ---------------------------------
+let enrollFactorId = null;
+
+async function openSecurityPanel() {
+  if (securityEl) securityEl.hidden = false;
+  await refreshSecurityStatus();
+}
+function closeSecurityPanel() {
+  if (securityEl) securityEl.hidden = true;
+  resetEnrollUi();
+}
+function resetEnrollUi() {
+  const enrollEl = $('#admin-2fa-enroll');
+  if (enrollEl) enrollEl.hidden = true;
+  const qrEl = $('#admin-2fa-qr'); if (qrEl) qrEl.innerHTML = '';
+  const secretEl = $('#admin-2fa-secret'); if (secretEl) secretEl.textContent = '';
+  const errEl = $('#admin-2fa-enroll-error'); if (errEl) errEl.hidden = true;
+}
+
+async function listVerifiedTotp() {
+  const { data, error } = await supabase.auth.mfa.listFactors();
+  if (error) throw error;
+  const all = (data && (data.all || data.totp)) || [];
+  return all.filter((f) => f.factor_type === 'totp' && f.status === 'verified');
+}
+
+async function refreshSecurityStatus() {
+  const statusEl = $('#admin-security-status');
+  const startEl = $('#admin-2fa-start');
+  const enrollEl = $('#admin-2fa-enroll');
+  const enabledEl = $('#admin-2fa-enabled');
+  startEl.hidden = true; enrollEl.hidden = true; enabledEl.hidden = true;
+  statusEl.textContent = 'Checking…';
+  try {
+    const verified = await listVerifiedTotp();
+    if (verified.length) {
+      statusEl.textContent = 'Two-factor is on for this account.';
+      enabledEl.hidden = false;
+    } else {
+      statusEl.textContent = 'Two-factor is off. Add an authenticator app for a second layer beyond your password.';
+      startEl.hidden = false;
+    }
+  } catch (e) {
+    statusEl.textContent = (e && e.message) || 'Could not load two-factor status.';
+  }
+}
+
+async function beginEnroll() {
+  const startEl = $('#admin-2fa-start');
+  const enrollEl = $('#admin-2fa-enroll');
+  const errEl = $('#admin-2fa-enroll-error');
+  const qrEl = $('#admin-2fa-qr');
+  const secretEl = $('#admin-2fa-secret');
+  errEl.hidden = true;
+  try {
+    // Clear any stale unverified factor so a fresh enroll can't collide on name.
+    const { data: existing } = await supabase.auth.mfa.listFactors();
+    for (const f of ((existing && existing.all) || []).filter((f) => f.status !== 'verified')) {
+      try { await supabase.auth.mfa.unenroll({ factorId: f.id }); } catch (_) {}
+    }
+    const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Meridian admin' });
+    if (error) throw error;
+    enrollFactorId = data.id;
+    const qr = data.totp && data.totp.qr_code;
+    qrEl.innerHTML = '';
+    if (qr && /^data:/i.test(qr)) {
+      const img = document.createElement('img');
+      img.src = qr; img.alt = 'Authenticator QR code'; img.width = 196; img.height = 196;
+      qrEl.appendChild(img);
+    } else if (qr && /<svg/i.test(qr)) {
+      qrEl.innerHTML = qr; // Supabase returns the QR as an inline SVG string
+    }
+    secretEl.textContent = (data.totp && data.totp.secret) || '';
+    startEl.hidden = true;
+    enrollEl.hidden = false;
+    const code = $('#admin-2fa-code');
+    if (code) { code.value = ''; if (code.focus) code.focus(); }
+  } catch (e) {
+    resetEnrollUi();
+    startEl.hidden = false;
+    $('#admin-security-status').textContent = (e && e.message) || 'Could not start enrollment.';
+  }
+}
+
+function wireEnrollForm() {
+  const form = $('#admin-2fa-enroll-form');
+  const errEl = $('#admin-2fa-enroll-error');
+  const codeInput = $('#admin-2fa-code');
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    errEl.hidden = true;
+    const code = (codeInput.value || '').trim();
+    if (!/^\d{6}$/.test(code)) {
+      errEl.textContent = 'Enter the 6-digit code from your app.';
+      errEl.hidden = false;
+      return;
+    }
+    const btn = form.querySelector('[type="submit"]');
+    const label = btn.textContent;
+    await withBusy(btn, async () => {
+      btn.textContent = 'Verifying…';
+      try {
+        if (!enrollFactorId) throw new Error('Enrollment expired — start again.');
+        const { data: chal, error: cerr } = await supabase.auth.mfa.challenge({ factorId: enrollFactorId });
+        if (cerr) throw cerr;
+        const { error: verr } = await supabase.auth.mfa.verify({ factorId: enrollFactorId, challengeId: chal.id, code });
+        if (verr) throw verr;
+        enrollFactorId = null;
+        flash('Two-factor enabled.');
+        resetEnrollUi();
+        await refreshSecurityStatus();
+      } catch (e) {
+        errEl.textContent = (e && e.message) || 'That code was not accepted.';
+        errEl.hidden = false;
+      } finally {
+        btn.textContent = label;
+      }
+    });
+  });
+  $('#admin-2fa-enroll-cancel').addEventListener('click', async () => {
+    if (enrollFactorId) {
+      try { await supabase.auth.mfa.unenroll({ factorId: enrollFactorId }); } catch (_) {}
+      enrollFactorId = null;
+    }
+    resetEnrollUi();
+    await refreshSecurityStatus();
+  });
+}
+
+async function disable2fa() {
+  if (!window.confirm('Disable two-factor? Your account will then be protected by password only.')) return;
+  try {
+    const { data, error } = await supabase.auth.mfa.listFactors();
+    if (error) throw error;
+    for (const f of ((data && data.all) || [])) {
+      await supabase.auth.mfa.unenroll({ factorId: f.id });
+    }
+    flash('Two-factor disabled.');
+    await refreshSecurityStatus();
+  } catch (e) {
+    flash((e && e.message) || 'Could not disable two-factor.', true);
+  }
 }
 
 function wireShell() {
@@ -226,6 +470,12 @@ function wireShell() {
   $$('.admin-tab').forEach((btn) => {
     btn.addEventListener('click', () => activateTab(btn.dataset.tab));
   });
+  // two-factor / security panel
+  $('#admin-2fa-btn').addEventListener('click', () => { openSecurityPanel(); });
+  $('#admin-security-close').addEventListener('click', () => { closeSecurityPanel(); });
+  $('#admin-2fa-enable').addEventListener('click', (e) => withBusy(e.currentTarget, beginEnroll));
+  $('#admin-2fa-disable').addEventListener('click', (e) => withBusy(e.currentTarget, disable2fa));
+  wireEnrollForm();
 }
 
 // ---------------------------------------------------------------------

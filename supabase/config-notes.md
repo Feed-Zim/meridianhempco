@@ -1,6 +1,7 @@
 # Meridian Hemp Co. — Supabase setup (Phase 0)
 
-> **STATUS: COMPLETED 2026-07-15** (except MARK ②/③ — admin login + allowlist row).
+> **STATUS: COMPLETED 2026-07-15** — incl. Mark's admin login + allowlist row,
+> and TOTP two-factor (migration 0005 + admin enroll/challenge UI, see below).
 > Project: `meridian-hemp`, ref `shujrqtvwdeqldbizgnk`, region `us-west-1`,
 > org "Feed-Zim's Org" (free plan). Migrations 0001→0004 applied; `meridian`
 > exposed in PostgREST; signups disabled; `coa-private` bucket created (Private);
@@ -91,6 +92,27 @@ marked **MARK** below. Everything else is automated in a session.
 
 - Never put the service-role key, DB password, or PAT in this repo. The PAT
   lives in `research/.env` (`SUPABASE_PAT`); the site ships only the anon key.
+
+## Two-factor authentication (TOTP) — added 2026-07-15
+
+- **Migration `0005_mfa_aal.sql`** rewrote `meridian.is_admin()` to the Supabase
+  "enforce MFA for users who have opted in" pattern: an admin with **no** verified
+  factor still passes at AAL1 (prevents self-lockout), but once **any** verified
+  TOTP factor exists, the session JWT must carry `aal = 'aal2'` or `is_admin()`
+  returns false — so every table AND the `coa-private` bucket become invisible
+  until a TOTP challenge elevates the session. One function change hardens the
+  whole surface (all RLS policies + storage policies call `is_admin()`).
+- **Admin UI** (`admin.js` / `admin.html`): password sign-in, then a step-up
+  challenge screen whenever a verified factor exists; a "Two-factor" panel in the
+  shell to enroll (QR + secret) or disable. Enroll/challenge/verify use the
+  vendored supabase-js `auth.mfa.*` API — no new dependency.
+- **Validated 2026-07-15**: a throwaway-admin harness (real JWTs + real TOTP
+  codes) passed 12/12 — AAL1-no-factor keeps access, post-enroll AAL1 is denied,
+  AAL2 is allowed; and the full enroll → re-login → challenge → shell flow was
+  driven in a real browser. All test accounts deleted afterward.
+- **Break-glass (lost authenticator):** delete the user's rows from
+  `auth.mfa_factors` (service role / Management API) — they drop back to the
+  AAL1-accepted branch and can sign in with password only, then re-enroll.
 - If the MCP is unavailable, the fallback is the old manual flow: paste each
   migration into the SQL Editor in order, then do steps 4–9 by hand in the
   dashboard.

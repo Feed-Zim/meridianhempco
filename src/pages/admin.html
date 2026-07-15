@@ -26,13 +26,75 @@
     </div>
   </section>
 
+  <section id="admin-mfa" class="admin-login" hidden>
+    <div class="wrap admin-login-wrap">
+      <form id="admin-mfa-form" class="form-card admin-login-card" novalidate>
+        <h1>Two-factor</h1>
+        <p class="admin-mfa-hint">Enter the 6-digit code from your authenticator app to finish signing in.</p>
+        <div class="field">
+          <label for="admin-mfa-code">Authentication code</label>
+          <input id="admin-mfa-code" name="code" type="text" inputmode="numeric"
+                 autocomplete="one-time-code" pattern="[0-9]*" maxlength="6"
+                 aria-describedby="admin-mfa-error" required>
+        </div>
+        <p id="admin-mfa-error" class="form-error" role="alert" hidden></p>
+        <div class="form-actions">
+          <button class="btn" type="submit">Verify</button>
+          <button id="admin-mfa-cancel" class="btn-quiet" type="button">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
   <div id="admin-shell" class="admin-shell" hidden>
     <div class="admin-topbar">
       <div class="wrap admin-topbar-inner">
         <h1 class="admin-title">Desk admin</h1>
         <div class="admin-topbar-right">
           <span id="admin-user-email" class="mono admin-user-email"></span>
+          <button id="admin-2fa-btn" class="btn-quiet" type="button">Two-factor</button>
           <button id="admin-signout" class="btn-quiet" type="button">Sign out</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="admin-security" class="admin-security wrap" hidden>
+      <div class="admin-security-card form-card">
+        <div class="admin-security-head">
+          <h2>Two-factor authentication</h2>
+          <button id="admin-security-close" class="btn-quiet" type="button">Close</button>
+        </div>
+        <p id="admin-security-status" class="admin-security-status">Checking…</p>
+
+        <div id="admin-2fa-start" hidden>
+          <button id="admin-2fa-enable" class="btn" type="button">Enable two-factor</button>
+        </div>
+
+        <div id="admin-2fa-enroll" hidden>
+          <p class="admin-security-hint">Scan this QR code with an authenticator app
+            (Google Authenticator, Authy, 1Password…), then enter the 6-digit code it shows.</p>
+          <div id="admin-2fa-qr" class="admin-2fa-qr"></div>
+          <p class="admin-2fa-secret">Can't scan? Enter this key manually:
+            <code id="admin-2fa-secret"></code></p>
+          <form id="admin-2fa-enroll-form" class="admin-2fa-confirm" novalidate>
+            <div class="field">
+              <label for="admin-2fa-code">Confirmation code</label>
+              <input id="admin-2fa-code" name="code" type="text" inputmode="numeric"
+                     autocomplete="one-time-code" pattern="[0-9]*" maxlength="6"
+                     aria-describedby="admin-2fa-enroll-error" required>
+            </div>
+            <p id="admin-2fa-enroll-error" class="form-error" role="alert" hidden></p>
+            <div class="form-actions">
+              <button class="btn" type="submit">Confirm &amp; enable</button>
+              <button id="admin-2fa-enroll-cancel" class="btn-quiet" type="button">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <div id="admin-2fa-enabled" hidden>
+          <p class="admin-2fa-enabled-note">Two-factor is <strong>on</strong>. You'll be asked
+            for a code from your authenticator each time you sign in.</p>
+          <button id="admin-2fa-disable" class="btn-quiet admin-2fa-danger" type="button">Disable two-factor</button>
         </div>
       </div>
     </div>
