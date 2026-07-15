@@ -117,20 +117,27 @@ marked **MARK** below. Everything else is automated in a session.
   migration into the SQL Editor in order, then do steps 4–9 by hand in the
   dashboard.
 
-## Phase 6 — Turnstile + Resend hardening (ACTIVATED 2026-07-15, test-mode email)
+## Phase 6 — Turnstile + Resend hardening (COMPLETE 2026-07-15, test-mode email)
 
 Goal: move public form submits from the direct anon insert (+ formsubmit email)
 to a Turnstile-gated Edge Function that inserts via service_role and emails via
 Resend — then revoke anon INSERT entirely so the function is the only write path.
 
-> **STATUS 2026-07-15 — LIVE.** `PUBLIC_SUBMIT_ENABLED = true` is deployed; both
-> forms route through `public-submit`. Secrets set: `CF-meridianhempco-Key`
-> (Turnstile), `Resend-meridianhempco-Key` (Resend), plus `NOTIFY_FROM =
-> "Meridian Hemp Co <onboarding@resend.dev>"` and `NOTIFY_TO =
-> markendaya1080@gmail.com` (Resend **test mode** — the built-in sender delivers
-> only to the account's own signup address; no verified domain yet). Verified:
-> Turnstile server-verify passes a real browser token; service_role insert →
-> 201; Resend email delivered.
+> **STATUS 2026-07-15 — COMPLETE & LOCKED DOWN.** `PUBLIC_SUBMIT_ENABLED = true`
+> is deployed; both forms route through `public-submit`, and **anon INSERT has
+> been revoked (migration `0007`)** — the function's service_role insert is now
+> the SOLE write path. Secrets set: `CF-meridianhempco-Key` (Turnstile),
+> `Resend-meridianhempco-Key` (Resend), plus `NOTIFY_FROM = "Meridian Hemp Co
+> <onboarding@resend.dev>"` and `NOTIFY_TO = markendaya1080@gmail.com` (Resend
+> **test mode** — the built-in sender delivers only to the account's own signup
+> address; no verified domain yet).
+>
+> **Human E2E passed 2026-07-15:** Mark submitted `/request/` in a real browser →
+> Turnstile passed → row `cc775721` landed via service_role (status `new`,
+> source `web` = DB-forced defaults) → Resend email arrived. Post-revoke proof:
+> a direct anon REST insert now returns `401 / 42501 permission denied for table
+> buyer_request`; catalog shows anon holds NO grant/policy on either intake
+> table, service_role holds INSERT on both.
 >
 > **Root-cause fix during activation (migration `0008`).** The first real insert
 > failed `42501 "permission denied for schema meridian"`: the `meridian` schema
@@ -140,9 +147,9 @@ Resend — then revoke anon INSERT entirely so the function is the only write pa
 > on the two intake tables **only** — it still cannot read the PII tables. The
 > honeypot/flag path hid this because it emails without touching the schema.
 >
-> **Remaining to fully close out:** (a) apply `0007` to revoke anon INSERT after
-> the human E2E confirms; (b) later, verify a real sending domain in Resend and
-> switch `NOTIFY_FROM`/`NOTIFY_TO` to `deals@meridianhempco.com`.
+> **Remaining (non-blocking):** verify a real sending domain in Resend (SPF/DKIM
+> DNS), then switch `NOTIFY_FROM`/`NOTIFY_TO` to `deals@meridianhempco.com` so
+> notifications reach the business inbox instead of Mark's personal Gmail.
 
 **What's already built and deployed (all inert until the switch is flipped):**
 - **Edge Function `public-submit`** — deployed (version 1, `verify_jwt` on).
@@ -156,8 +163,9 @@ Resend — then revoke anon INSERT entirely so the function is the only write pa
   `PUBLIC_SUBMIT_ENABLED = false`. `forms.js` mounts the Turnstile widget and
   routes through the function ONLY when that flag is true; today it behaves
   exactly as before.
-- **Revoke migration `0007_phase6_revoke_anon_insert.sql`** — staged, NOT
-  applied. Has an inline rollback block.
+- **Revoke migration `0007_phase6_revoke_anon_insert.sql`** — APPLIED
+  2026-07-15 after the human E2E passed. anon now holds no grant/policy in
+  schema `meridian`. Has an inline rollback block if the function ever breaks.
 
 **The two SECRETS (never in the repo, never in the browser):**
 - `TURNSTILE_SECRET` — Cloudflare Turnstile secret key (pairs with the site key).
@@ -191,9 +199,10 @@ localhost origin here temporarily if testing from a local preview).
 6. **Test end-to-end** — submit both forms on the live site: Turnstile renders,
    a row lands in `farm_intake`/`buyer_request`, and the Resend email arrives.
    Trip the honeypot/time-trap → a `[FLAGGED]` email arrives, NO row written.
-7. **Revoke anon** — only after step 6 passes, apply
-   `0007_phase6_revoke_anon_insert.sql` (MCP `apply_migration`). Now the function
-   is the sole write path. Re-test both forms once more.
+7. **Revoke anon** — ✅ DONE 2026-07-15. Applied
+   `0007_phase6_revoke_anon_insert.sql` (MCP `apply_migration`) after the human
+   E2E passed. The function is now the sole write path; a direct anon insert
+   returns 401/42501. Re-verified via catalog + a live denied-insert probe.
 8. **Retire formsubmit** — it's no longer used in edge mode; leave the code path
    as the automatic fallback (it re-activates if the flag is ever turned off).
 
