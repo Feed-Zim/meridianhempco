@@ -117,11 +117,32 @@ marked **MARK** below. Everything else is automated in a session.
   migration into the SQL Editor in order, then do steps 4–9 by hand in the
   dashboard.
 
-## Phase 6 — Turnstile + Resend hardening (BUILT 2026-07-15, dormant)
+## Phase 6 — Turnstile + Resend hardening (ACTIVATED 2026-07-15, test-mode email)
 
 Goal: move public form submits from the direct anon insert (+ formsubmit email)
 to a Turnstile-gated Edge Function that inserts via service_role and emails via
 Resend — then revoke anon INSERT entirely so the function is the only write path.
+
+> **STATUS 2026-07-15 — LIVE.** `PUBLIC_SUBMIT_ENABLED = true` is deployed; both
+> forms route through `public-submit`. Secrets set: `CF-meridianhempco-Key`
+> (Turnstile), `Resend-meridianhempco-Key` (Resend), plus `NOTIFY_FROM =
+> "Meridian Hemp Co <onboarding@resend.dev>"` and `NOTIFY_TO =
+> markendaya1080@gmail.com` (Resend **test mode** — the built-in sender delivers
+> only to the account's own signup address; no verified domain yet). Verified:
+> Turnstile server-verify passes a real browser token; service_role insert →
+> 201; Resend email delivered.
+>
+> **Root-cause fix during activation (migration `0008`).** The first real insert
+> failed `42501 "permission denied for schema meridian"`: the `meridian` schema
+> was granted to `anon`/`authenticated` only, never `service_role`, so the
+> function (which inserts via the service key) had no access. `0008_phase6_grant_
+> service_role_intake.sql` grants service_role `USAGE` on the schema + `INSERT`
+> on the two intake tables **only** — it still cannot read the PII tables. The
+> honeypot/flag path hid this because it emails without touching the schema.
+>
+> **Remaining to fully close out:** (a) apply `0007` to revoke anon INSERT after
+> the human E2E confirms; (b) later, verify a real sending domain in Resend and
+> switch `NOTIFY_FROM`/`NOTIFY_TO` to `deals@meridianhempco.com`.
 
 **What's already built and deployed (all inert until the switch is flipped):**
 - **Edge Function `public-submit`** — deployed (version 1, `verify_jwt` on).
@@ -161,15 +182,19 @@ localhost origin here temporarily if testing from a local preview).
    or `supabase secrets set TURNSTILE_SECRET=… RESEND_API_KEY=… NOTIFY_FROM=…`,
    or hand them to Claude (research/.env / safe DM) to push via Management API.
    The Supabase MCP has no secrets tool — this goes through the dashboard/CLI/API.
-4. **Flip the flag** — set `PUBLIC_SUBMIT_ENABLED = true` in supabase-config.js;
+4. **Grant service_role** — apply `0008_phase6_grant_service_role_intake.sql`
+   (MCP `apply_migration`). REQUIRED: the schema was anon/authenticated-only, so
+   without this the function's service_role insert fails `42501 permission denied
+   for schema meridian`. Do this before (or with) the flag flip.
+5. **Flip the flag** — set `PUBLIC_SUBMIT_ENABLED = true` in supabase-config.js;
    rebuild; sync to the deploy repo (`Feed-Zim/meridianhempco`); push → CI deploys.
-5. **Test end-to-end** — submit both forms on the live site: Turnstile renders,
+6. **Test end-to-end** — submit both forms on the live site: Turnstile renders,
    a row lands in `farm_intake`/`buyer_request`, and the Resend email arrives.
    Trip the honeypot/time-trap → a `[FLAGGED]` email arrives, NO row written.
-6. **Revoke anon** — only after step 5 passes, apply
+7. **Revoke anon** — only after step 6 passes, apply
    `0007_phase6_revoke_anon_insert.sql` (MCP `apply_migration`). Now the function
    is the sole write path. Re-test both forms once more.
-7. **Retire formsubmit** — it's no longer used in edge mode; leave the code path
+8. **Retire formsubmit** — it's no longer used in edge mode; leave the code path
    as the automatic fallback (it re-activates if the flag is ever turned off).
 
 **Rollback:** set `PUBLIC_SUBMIT_ENABLED = false` (rebuild/deploy) and run the
