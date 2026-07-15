@@ -120,7 +120,13 @@
 
   <section class="form-section">
     <div class="wrap">
-      <form class="form-card" data-form="buyer-request" novalidate>
+      <!-- action/method = native no-JS fallback straight to the email relay;
+           with JS active, forms.js preventDefaults and handles submission. -->
+      <form class="form-card" data-form="buyer-request" novalidate
+            action="https://formsubmit.co/deals@meridianhempco.com" method="POST">
+        <input type="hidden" name="_subject" value="New buyer request (via site form)">
+        <input type="hidden" name="_next" value="https://meridianhempco.com/request/?sent=1">
+        <noscript><p class="form-note">JavaScript is off — the form still submits by email, or write to deals@meridianhempco.com directly. State fields below need JavaScript; mention your state in the message instead.</p></noscript>
         <div class="form-grid">
 
           <h2 class="form-legend">Who you are</h2>
@@ -211,6 +217,7 @@
   </section>
 
 </main>
+<script defer src="/assets/js/vendor/supabase.min.js"></script>
 <script type="module" src="/assets/js/forms.js"></script>
 <footer class="site-footer">
   <div class="wrap footer-grid">

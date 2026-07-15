@@ -5,7 +5,7 @@
 // -> Supabase insert (RLS-scoped anon insert, no .select()) -> fire-and-forget
 // email notification -> on-brand success panel. Any failure short of the
 // honeypot/time-trap checks re-enables the form with an inline error.
-import { supabase, isConfigured } from './supabase-client.js';
+import { supabase } from './supabase-client.js';
 
 const TABLE_BY_FORM = {
   'buyer-request': 'buyer_request',
@@ -107,6 +107,9 @@ function collectPayload(form) {
 
   for (const field of form.elements) {
     if (!field.name || field.name === 'hp' || seen.has(field.name)) continue;
+    // underscore-prefixed inputs are formsubmit control fields (native no-JS
+    // fallback path) — never part of the DB payload
+    if (field.name.startsWith('_')) continue;
     if (field.tagName === 'BUTTON') continue;
 
     if (field.type === 'checkbox') {
@@ -129,17 +132,25 @@ function collectPayload(form) {
   return payload;
 }
 
-// Fire-and-forget email notification. Never awaited for UI purposes; errors
-// are caught and ignored so a flaky third-party endpoint can't block the
-// on-brand success confirmation the visitor sees.
-function notifyByEmail(payload, formType) {
-  const flat = { form: formType, ...payload };
+// Email notification via formsubmit. Returns a promise resolving true only on
+// a confirmed 2xx — callers decide whether to await it (it is the ONLY capture
+// path until Supabase is configured, so silent failure there = a lost lead).
+function notifyByEmail(payload, formType, flag) {
+  const who = payload.company || payload.legal_name || payload.contact_name || 'unnamed';
+  const kind = formType === 'buyer-request' ? 'buyer request' : 'farm intake';
+  const flat = {
+    _subject: `${flag ? '[FLAGGED ' + flag + '] ' : ''}New ${kind} — ${who}`,
+    _template: 'table',
+    form: formType,
+    ...payload,
+  };
+  if (flag) flat.flagged = flag;
   if (Array.isArray(flat.material_types)) flat.material_types = flat.material_types.join(', ');
-  fetch(NOTIFY_EMAIL, {
+  return fetch(NOTIFY_EMAIL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify(flat),
-  }).catch(() => {});
+  }).then((r) => r.ok).catch(() => false);
 }
 
 function showSuccess(form) {
@@ -168,15 +179,19 @@ function initForm(form) {
     event.preventDefault();
 
     // Honeypot — bots tend to fill every field, humans never see this one.
+    // A trip still emails a [FLAGGED] copy (a false positive must never cost
+    // a real lead) but shows the bot a plain success and writes no DB row.
     const hp = form.querySelector('[name="hp"]');
     if (hp && hp.value.trim() !== '') {
+      notifyByEmail(collectPayload(form), formType, 'honeypot');
       showSuccess(form);
       return;
     }
 
     // Time-trap — a real visitor takes more than a couple seconds to read
-    // and fill the form; a bot submits near-instantly.
+    // and fill the form; a bot submits near-instantly. Same flagged-copy rule.
     if (Date.now() - loadedAt < MIN_SUBMIT_MS) {
+      notifyByEmail(collectPayload(form), formType, 'time-trap');
       showSuccess(form);
       return;
     }
@@ -192,13 +207,17 @@ function initForm(form) {
     const payload = collectPayload(form);
 
     try {
-      if (isConfigured()) {
+      if (supabase) {
+        // DB row is the source of truth; the email copy is fire-and-forget.
         const { error } = await supabase.from(table).insert(payload);
         if (error) throw error;
+        notifyByEmail(payload, formType);
+      } else {
+        // Email is the ONLY capture path (Supabase unconfigured or the
+        // vendored bundle failed) — await it and refuse to fake success.
+        const delivered = await notifyByEmail(payload, formType);
+        if (!delivered) throw new Error('notification email failed');
       }
-      // Fire-and-forget email — the sole notification path when Supabase
-      // isn't configured yet, and a confirmation copy for Mark otherwise.
-      notifyByEmail(payload, formType);
       showSuccess(form);
     } catch (err) {
       console.error(err);

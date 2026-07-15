@@ -1,7 +1,9 @@
-// Thin Supabase client wrapper for the public forms (buyer request / farm intake).
-// Reads runtime config from supabase-config.js so the anon key + URL are the
-// only things that need to change when Phase 0 (Postgres/Supabase setup) lands.
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+// Thin Supabase client wrapper for the public forms and admin dashboard.
+// Uses the VENDORED UMD bundle (/assets/js/vendor/supabase.min.js, loaded via a
+// classic <script defer> tag before any module script) — window.supabase — so
+// there is NO runtime CDN dependency: if the bundle somehow fails to load, this
+// module still imports cleanly and `supabase` is null, letting forms.js fall
+// back to email-only capture instead of dying with it.
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase-config.js';
 
 // True once the placeholder tokens have been swapped for real project values.
@@ -9,11 +11,10 @@ export function isConfigured() {
   return SUPABASE_URL !== '__SUPABASE_URL__' && SUPABASE_ANON_KEY !== '__SUPABASE_ANON_KEY__';
 }
 
-// Only construct the client when configured — createClient() throws on an
-// invalid placeholder URL, and forms.js has a working fallback (email-only)
-// for the unconfigured state, so this must not throw at module-load time.
-export const supabase = isConfigured()
-  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+const factory = (typeof window !== 'undefined' && window.supabase && window.supabase.createClient) || null;
+
+export const supabase = (isConfigured() && factory)
+  ? factory(SUPABASE_URL, SUPABASE_ANON_KEY, {
       db: { schema: 'meridian' },
       auth: { persistSession: true },
     })

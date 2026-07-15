@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>For growers — Meridian Hemp Co</title>
-<meta name="description" content="Licensed hemp farms: introduce your lots to the desk. License and COA verified before anything is offered, and your farm identity stays protected.">
+<title>Current lots — Meridian Hemp Co</title>
+<meta name="description" content="Live wholesale CBD hemp flower inventory, shared by request. Strain, grow type, CBD%, total THC%, trim, pounds, and landed price per pound.">
 <meta name="robots" content="index,follow">
-<link rel="canonical" href="https://meridianhempco.com/growers/">
+<link rel="canonical" href="https://meridianhempco.com/lots/">
 <meta name="theme-color" content="#1E5C3F" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0F1512" media="(prefers-color-scheme: dark)">
 
 <meta property="og:site_name" content="Meridian Hemp Co">
 <meta property="og:type" content="website">
-<meta property="og:title" content="For growers — Meridian Hemp Co">
-<meta property="og:description" content="Introduce your lots. License and COA verified, your farm's name stays off the table.">
-<meta property="og:url" content="https://meridianhempco.com/growers/">
+<meta property="og:title" content="Current lots — Meridian Hemp Co">
+<meta property="og:description" content="Live inventory changes fast, so I share the current lot menu by request.">
+<meta property="og:url" content="https://meridianhempco.com/lots/">
 <meta property="og:image" content="https://meridianhempco.com/assets/img/og-default.jpg">
 <meta name="twitter:card" content="summary_large_image">
 
@@ -76,7 +76,7 @@
 
     <nav class="primary-nav desktop" aria-label="Primary">
       <a href="/how-it-works/" >How it works</a>
-      <a href="/lots/" >Lots</a>
+      <a href="/lots/" aria-current="page">Lots</a>
       <a href="/compliance/" >Compliance</a>
       <a href="/contact/" >Contact</a>
     </nav>
@@ -96,7 +96,7 @@
         <div class="nav-panel">
           <a href="/" >Home</a>
           <a href="/how-it-works/" >How it works</a>
-          <a href="/lots/" >Lots</a>
+          <a href="/lots/" aria-current="page">Lots</a>
           <a href="/compliance/" >Compliance</a>
           <a href="/contact/" >Contact</a>
           <div class="nav-panel-sep"></div>
@@ -111,112 +111,28 @@
   <section class="page-intro">
     <div class="wrap">
       <div class="section-head">
-        <p class="kicker">For growers</p>
-        <h1>Put your harvest on the desk.</h1>
-        <p class="lead">Introduce your farm and what you're holding. I verify your license and your COA before anything is offered — and your farm's name stays off the table. Buyers deal with Meridian, not with you, unless you choose otherwise.</p>
+        <p class="kicker">Current lots</p>
+        <h1>The lot menu is shared by request.</h1>
+        <p class="lead">Wholesale inventory moves fast — a public list would be stale in a week and would show competitors my hand. So the current menu goes out by request: strain, grow type, CBD%, total THC%, trim, pounds available, and a landed price per pound, each line backed by a verified lab report.</p>
       </div>
     </div>
   </section>
 
-  <section class="form-section">
+  <section class="section-tight" aria-labelledby="menu-title">
     <div class="wrap">
-      <!-- action/method = native no-JS fallback straight to the email relay;
-           with JS active, forms.js preventDefaults and handles submission. -->
-      <form class="form-card" data-form="farm-intake" novalidate
-            action="https://formsubmit.co/deals@meridianhempco.com" method="POST">
-        <input type="hidden" name="_subject" value="New farm intake (via site form)">
-        <input type="hidden" name="_next" value="https://meridianhempco.com/growers/?sent=1">
-        <noscript><p class="form-note">JavaScript is off — the form still submits by email, or write to deals@meridianhempco.com directly. The state dropdown needs JavaScript; mention your state in the message instead.</p></noscript>
-        <div class="form-grid">
-
-          <h2 class="form-legend">Your operation</h2>
-
-          <div class="field">
-            <label for="fi-legal-name">Legal business name <span class="req">*</span></label>
-            <input id="fi-legal-name" name="legal_name" type="text" autocomplete="organization" required>
-          </div>
-          <div class="field">
-            <label for="fi-dba">DBA / farm name</label>
-            <input id="fi-dba" name="dba" type="text">
-          </div>
-          <div class="field">
-            <label for="fi-state">State <span class="req">*</span></label>
-            <select id="fi-state" name="state" data-states="Select a state" required></select>
-          </div>
-          <div class="field">
-            <label for="fi-contact-name">Contact name <span class="req">*</span></label>
-            <input id="fi-contact-name" name="contact_name" type="text" autocomplete="name" required>
-          </div>
-          <div class="field">
-            <label for="fi-email">Email <span class="req">*</span></label>
-            <input id="fi-email" name="contact_email" type="email" autocomplete="email" required>
-          </div>
-          <div class="field">
-            <label for="fi-phone">Phone</label>
-            <input id="fi-phone" name="contact_phone" type="tel" autocomplete="tel">
-          </div>
-
-          <h2 class="form-legend">License &amp; capacity</h2>
-
-          <div class="field">
-            <label for="fi-license-type">License type</label>
-            <select id="fi-license-type" name="license_type">
-              <option value="">Select one</option>
-              <option value="usda">USDA producer license</option>
-              <option value="state">State program license</option>
-              <option value="unknown">Not sure</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="fi-license-number">License #</label>
-            <input id="fi-license-number" name="license_number" type="text">
-            <p class="field-hint">Checked against the USDA / state registry before any lot is offered.</p>
-          </div>
-          <div class="field">
-            <label for="fi-capacity">Annual capacity (lb/yr)</label>
-            <input id="fi-capacity" name="annual_capacity_lb" type="number" min="0" step="1" inputmode="numeric">
-            <p class="field-hint">A rough figure is fine.</p>
-          </div>
-
-          <h2 class="form-legend">What you're holding</h2>
-
-          <div class="field field-span">
-            <span class="check-label" id="fi-materials-label" style="font-weight:600;font-size:var(--step--1)">Material types</span>
-            <div class="check-group" role="group" aria-labelledby="fi-materials-label">
-              <label class="check-option"><input type="checkbox" name="material_types" value="cbd_flower"> CBD flower</label>
-              <label class="check-option"><input type="checkbox" name="material_types" value="smalls"> Smalls / pre-roll grade</label>
-              <label class="check-option"><input type="checkbox" name="material_types" value="biomass"> Biomass</label>
-              <label class="check-option"><input type="checkbox" name="material_types" value="pre_rolls"> Finished pre-rolls</label>
-            </div>
-          </div>
-          <div class="field field-span">
-            <label for="fi-coa">Link to a recent COA</label>
-            <input id="fi-coa" name="coa_link" type="url" placeholder="https://…">
-            <p class="field-hint">Or email the PDF to deals@meridianhempco.com — every lot needs a current lab report before it's offered.</p>
-          </div>
-          <div class="field field-span">
-            <label for="fi-message">Anything else</label>
-            <textarea id="fi-message" name="message" placeholder="Strains, harvest timing, price expectations…"></textarea>
-          </div>
-
-          <div class="field hp-field" aria-hidden="true">
-            <label for="fi-hp">Leave this field empty</label>
-            <input id="fi-hp" name="hp" type="text" tabindex="-1" autocomplete="off">
-          </div>
-
-          <div class="form-actions">
-            <button class="btn" type="submit">Introduce your farm</button>
-            <p class="form-note">Your details are used to verify and match — never shown to buyers.</p>
-          </div>
-
+      <div class="notice">
+        <p class="kicker">Get this week's menu</p>
+        <h2 id="menu-title">Tell me your spec. The menu comes back within one business day.</h2>
+        <p>Grade, volume, price target, and the state it ships to — that's all I need to send back the lots that actually fit, quoted delivered.</p>
+        <div class="cta-row" style="margin-top:18px">
+          <a class="btn" href="/request/">Request material</a>
+          <a class="btn btn-quiet" href="mailto:deals@meridianhempco.com?subject=Lot%20menu%20request">Or just email the desk</a>
         </div>
-      </form>
+      </div>
     </div>
   </section>
 
 </main>
-<script defer src="/assets/js/vendor/supabase.min.js"></script>
-<script type="module" src="/assets/js/forms.js"></script>
 <footer class="site-footer">
   <div class="wrap footer-grid">
     <div class="footer-brand">
