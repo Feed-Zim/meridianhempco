@@ -759,6 +759,9 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .form-success h3 { font-size: var(--step-2); margin: 0 0 4px; }
 .form-success p { color: var(--muted); }
 
+/* Phase 6: Cloudflare Turnstile widget (dormant until PUBLIC_SUBMIT_ENABLED). */
+.mhc-turnstile { margin: 4px 0 18px; min-height: 65px; }
+
 /* =====================================================================
    ADMIN — /admin/ desk dashboard (internal CRUD tool, single admin).
    Reuses .btn / .btn-quiet / .form-card / .field / .check-option from the

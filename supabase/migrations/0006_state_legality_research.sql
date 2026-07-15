@@ -1,0 +1,66 @@
+-- =============================================================================
+-- 0006_state_legality_research.sql
+-- Meridian Hemp Co. farm-CRM — resolve the 24 states + DC that 0003 seeded 'gray'
+-- pending dedicated research. Judged specifically for RECEIVING/SELLING SMOKABLE
+-- CBD HEMP FLOWER (material_lot.material_type in cbd_flower/smalls/biomass/
+-- pre_rolls), ≤0.3% TOTAL THC (Δ9 + 0.877×THCA), shipped FROM Wyoming into the
+-- destination state.
+--
+-- Retrieval date: 2026-07-15. Per-state primary sources are recorded in
+-- notes/hemp/state-matrix-gray-states-resolved.md (statutes, rules, cases, URLs).
+--
+-- Federal backdrop (unchanged): P.L. 119-37 §781 total-THC 0.3% + 0.4mg-THC/
+-- container cap, effective 2026-11-12. The 0.4mg/container cap in particular
+-- threatens the smokable-flower model NATIONWIDE (a compliant ≤0.3%-total-THC
+-- gram still carries ~2-3mg THC) and could reclassify several 'allowed' lanes
+-- below on/after that date — needs dedicated legal analysis before it arrives.
+--
+-- 'allowed' here = a lawful non-dispensary lane for smokable hemp flower exists
+-- as of 2026-07-15; it does NOT waive the per-deal manual destination check in
+-- the admin workflow, and the first shipment to any newly-'allowed' state should
+-- get attorney sign-off (several carry pending 2026 bills / medium confidence).
+-- TX, MO, IL remain 'gray' from 0003 (already researched, genuinely volatile) —
+-- intentionally NOT touched here.
+--
+-- Upsert so it can be safely re-run.
+-- =============================================================================
+
+insert into meridian.state_legality (state, status, notes) values
+  -- ---------------------------------------------------------------------
+  -- ALLOWED (6) — lawful smokable-flower lane exists as of 2026-07-15
+  -- ---------------------------------------------------------------------
+  ('WY', 'allowed', $z$Home state. SEA 24/SF0032 (2024), W.S. §35-7-1001 et seq. + WDA Ch.61: total-THC (post-decarb, Δ9+0.877×THCA) ≤0.3%; natural unaltered smokable flower is NOT form-banned (law targets synthetics + Δ8). Upheld by 10th Cir. in Green Room LLC v. Wyoming (10/27/25). No state retail license; WDA grower/processor $750/$500. No uniform age law (HB171=18; 21+ is industry norm). [high]$z$),
+  ('NM', 'allowed', $z$Standalone lawful hemp channel separate from the CCD marijuana track: Hemp Manufacturing Act (NMSA Ch.76 Art.24) + Hemp Final Rule (eff 1/28/26) regulate inhalable hemp as a permitted "Hemp Retail Manufacturer" category; natural hemp ≤0.3% total THC. HB 346 (2025) moved retail authority to NMED + banned synthetics (Δ8/HHC/THC-O). NMED facility permit $1,000. 21+ for intoxicating hemp. [med-high]$z$),
+  ('WV', 'allowed', $z$W.Va. Code §19-12E-12 (Select Plant-Based Derivatives Act, WVDA) — no statutory smokable-form ban. Total-THC (Δ9+0.877×THCA) basis per WVDA lab method. 21+. WVDA product reg $200/product/yr (cap $1,000; $500 if WV-grown) + $100/retail site/yr; out-of-state/online sellers must register. SB 808 (2026 smokable ban) died in committee 3/14/26 — reintroduction risk. Verify raw flower is a registerable product category with WVDA before shipping. [med]$z$),
+  ('CT', 'allowed', $z$Conn. Gen. Stat. §§21a-420(5),(8) & 22-61l exclude compliant hemp flower (≤0.3% total THC, Δ9+0.877×THCA) from "cannabis." For FLOWER the 0.3% dry-wt test substitutes for the mg/container caps that gate manufactured products, so flower is not dispensary-only. §22-61l(f) exempts pure wholesalers/retailers from licensure; flower sales require 21+ ID. PA 26-8 (5/20/26) preserves the carve-out. AG Tong aggressive on synthetic/non-compliant hemp — real field-enforcement risk. [med-high]$z$),
+  ('RI', 'allowed', $z$CCC rule 560-RICR-10-20-1 (eff 12/8/25) expressly permits raw hemp flower/pre-rolls at wholesale/retail; RIGL 21-28.11-3 excludes hemp from "marijuana" so no cannabis license needed. Retail test = TOTAL THC ≤0.3% dry wt (also 1mg/serving, 5mg/pkg). CBD Distributor/Retailer license $250 app + $500/yr, 21+. CAVEAT: CCC paused NEW hemp retailer license issuance 7/2025 (mid-2026 status unconfirmed) — entry-friction risk. 2026 bills target THC beverages only. [med]$z$),
+  ('ME', 'allowed', $z$7 M.R.S. §2231(1-A)(D): hemp ≤0.3% Δ9 dry wt, "or as otherwise defined in federal law"; no smokable-flower ban — DACF's Apr-2026 FY25 report confirms smokable bud/spliffs are actively sold statewide. No state license for wholesale/retail flower (DACF licenses growers only, $100-500/yr); 21+/packaging rules cover only ingestible "potentially intoxicating" products, not raw flower. §2231 AUTO-IMPORTS the 11/12/26 federal total-THC/0.4mg cutover — DACF warns it will disrupt current models. [high]$z$),
+  -- ---------------------------------------------------------------------
+  -- GRAY (5) — no clean answer; fail-closed, verify before any offer
+  -- ---------------------------------------------------------------------
+  ('NE', 'gray', $z$No statutory smokable-flower ban; Hemp Farming Act (§2-503) defines hemp Δ9-only ≤0.3%, most licensing repealed (LB262 → USDA took over 1/1/25) so no state license/fee/age. Ban bills failed (LB316 died 4/17/26; LB16 2025). AG Hilgers targets mislabeled/synthetic sellers (200+ C&D), not compliant flower per se. Gov EO 26-02 eyes the federal 0.4mg/pkg cap (11/12/26). Practitioners still call it a gray area; fail-closed → gray. [med]$z$),
+  ('AR', 'gray', $z$No named smokable-form ban, but Act 934 (2025) makes any hemp product with detectable total THC presumptively an "intoxicating hemp product" — a FELONY (A.C.A. §20-56-513(c)) unless within a narrow carve-out (≤1mg total THC/container + CBD:THC>15:1) that commercial flower blows past in <1g. Total-THC basis. Tobacco Control permits $5,000/yr each. 21+. Bio Gen v. Sanders (8th Cir 6/24/25) upheld the regime; finality unsettled. Leans blocked. [med]$z$),
+  ('OK', 'gray', $z$No explicit smokable-form ban; ODAFF uses total THC (≤0.3%, reaffirmed 1/16/26 letter), so genuinely-compliant flower meets the cultivation test. BUT HB 3770 (63 O.S. §420A) routes "intoxicating hemp cannabinoids" to OMMA dispensaries only (scope re: natural Δ9 flower unclear); Stitt/OMMA enforcement pressure; odor alone = probable cause (OK CCA). SB 3 (2026 container cap) stalled. No state age min. Leans blocked. [med]$z$),
+  ('ND', 'gray', $z$NDCC 4.1-18.1-01(5)(b)(1) EXCLUDES hemp "chopped, separated, or dried for transfer or storage" (raw flower/smalls/biomass) from allowable "hemp commodity or product"; §04.4(3) routes non-allowable hemp to Title 19-24.1 (Medical Marijuana — no adult-use; Measure 5 failed 11/24). Admin code 7-20 conflictingly contemplates "hemp flower products" (≤5mg/serving, CBD:THC>15:1). Total-THC basis. AG polices out-of-state shippers (2023 settlement). Needs NDDA/counsel confirmation; leans blocked. [med]$z$),
+  ('NH', 'gray', $z$RSA 439-A:2 uses a Δ9-only 0.3% dry-wt hemp test; §439-A:4 bars products with THC >0.3% "in any formulation" — sources split on whether THCA-rich smokable flower is already caught → gray. SB624 (signed 7/2/26) adds total-THC(+THCA) 0.3% + 0.4mg/container caps + age-21, effective 1/1/27 (near the federal cutover). No state retail license now; SB485 licensing bill stalled. [med]$z$),
+  -- ---------------------------------------------------------------------
+  -- BLOCKED (14) — form ban, effective bar, or dispensary-only channel
+  -- ---------------------------------------------------------------------
+  ('MT', 'blocked', $z$SB 375 (eff 5/5/25, Title 50) bans retail sale of any hemp product with detectable Δ9 THC unless FDA-approved; HB 49 caps 0.5mg/serving, 2mg/package. Raw smokable flower inherently carries detectable Δ9 → de facto ban on inhalable hemp flower, ahead of the federal cutover. [high]$z$),
+  ('ID', 'blocked', $z$Zero-tolerance: ISDA enforces a 0.0% detectable-THC standard at retail/possession (one of two zero-THC states with KS); smoking hemp flower is banned regardless of %. Idaho Code §37-2701/2705; the §22-1703 hemp exemption is 0.3% total-THC for CULTIVATION only. Long felony-charge history for hemp merely transiting (Big Sky Scientific). HB478 (2025) would codify the zero-THC retail rule. [high]$z$),
+  ('UT', 'blocked', $z$HB 54 (2025, eff 5/7/25), Utah Code §4-41-102: smokable hemp flower is explicitly non-registrable/unlawful to sell in smokable form regardless of THC% — a hard form ban. Compliant ingestibles use total-THC ≤0.3% (5mg/serving, 150mg/package) via UDAF registration, 21+. [high]$z$),
+  ('NV', 'blocked', $z$NRS 557 sets cultivation at 0.3% total THC, but SB 356 (2025) confines any consumable hemp product with cannabinoids beyond CBD/CBG (incl. compliant smokable flower, which carries detectable THC) to CCB-licensed cannabis dispensaries only; mail/courier delivery of such product into NV is a misdemeanor — forecloses a broker ship-in model. 21+. [high]$z$),
+  ('AK', 'blocked', $z$11 AAC 40 imposes a zero-tolerance any-detectable-Δ9 retail standard (stricter than the federal 0.3%); THCA counts via post-decarb. Smokable flower is swept out of the hemp channel into the AMCO marijuana system (3 AAC 306, eff 11/3/23); upheld D. Alaska ~5/25. Retailer registration $100/yr. 21+. [high]$z$),
+  ('HI', 'blocked', $z$Statutory form ban: HRS §328G-3/§328G-4 exclude leaf/floral material from the "manufactured hemp product" definition — only oral/topical forms are legal; smokable flower/pre-rolls/biomass are banned regardless of THC (Act 14/2020). DOH OMCCR retailer/shipper registration ($50/5yr) required incl. out-of-state, enforced 7/1/26. Total-THC basis. 2026 loosening bills (SB3206, HB2613) died. [med-high]$z$),
+  ('IA', 'blocked', $z$Statutory form ban: Iowa Code §204.14A (HF 2605, eff 7/1/24) criminalizes inhalable hemp incl. raw flower/smalls/biomass/pre-rolls regardless of THC (serious misdemeanor, up to 1 yr). Consumable-hemp retailers register with Iowa HHS ($475/yr); 21+. 2026 HSB753 would reaffirm (not lift) the inhalable ban. [high]$z$),
+  ('SD', 'blocked', $z$SDCL 38-35-21 bans the sale or use of hemp "for smoking or inhaling" (Class 1 misdemeanor) regardless of THC; covers wholesale. HB 1125 adds a post-decarb total-THC marijuana test, enforced 7/14/25. SB 39 (eff 1/1/27) shifts licensing to USDA but expressly preserves the smoking ban. No codified CBD purchase age. [high]$z$),
+  ('KS', 'blocked', $z$K.S.A. 2-3908(a) bans hemp cigarettes/cigars/vape (pre-rolls) for all persons; 2-3908(b) bars sale of raw buds/flower/biomass to anyone not a registered hemp processor — retail-to-consumer is illegal; only processor-to-processor wholesale survives. Non-compliant flower risks a marijuana charge (21-5701). 1st offense Class A misd., 2nd a felony. Δ9-only def but AG uses total-THC. SB 292 pending. [high]$z$),
+  ('DC', 'blocked', $z$No hemp carve-out: DC Code §48-901.02(3) treats any cannabinoid plant material as "cannabis" regardless of THC% (OAG opinion AL-21-222). Smokable flower is lawful only via a Medical Cannabis Retailer license ($8k app + $16k/yr, DC-incorporated, patients only). Active ABCA enforcement (Mar 2026 closure). The congressional Harris Rider still blocks any adult-use retail system. [high]$z$),
+  ('DE', 'blocked', $z$No DE statute licenses a non-dispensary retail channel for smokable hemp flower; 16 Del.C. §4714 schedules "any quantity" of THC; the hemp carve-out (3 Del.C. §2801) is Δ9-only 0.3% and cultivation-scoped, not clearly reaching THCA flower. OMC treats inhalable hemp as marijuana. HB395 (House-passed 6/16/26, pending Senate) would set a 0.4mg/container cap tied to the 11/12/26 federal cutover, barring smokable flower outside dispensaries. Fail-closed. [med]$z$),
+  ('MD', 'blocked', $z$ABCA §36-1102 caps THC at 0.5mg/serving & 2.5mg/package for any product for consumption/inhalation sold outside MCA licensure; "THC" includes Δ9 "regardless of how derived" → a 0.3% flower unit breaches the 2.5mg/pkg cap at ~0.83g, so any real-weight flower/biomass/pre-roll is illegal outside a full MCA cannabis license (§36-401). Appellate Court (Moore v. MD Hemp Coalition, 9/9/25): hemp intoxicants "always been illegal." Active ATCC seizures 2026. 21+. [high]$z$),
+  ('MA', 'blocked', $z$M.G.L. c.94G §1 excludes hemp via a total-THC test. MDAR policy bans retail sale of raw/whole-plant smokable flower outright; c.94G §12 lets only MDAR-licensed (MA-based) hemp sell finished flower to CCC marijuana establishments (21+) — a channel closed to an out-of-state broker. MDAR license $100 + $300-500/yr. H.5350 (4/19/26) only directs the CCC to study intoxicating hemp; no new lane opens before the 11/12/26 federal cutover. [med]$z$),
+  ('VT', 'blocked', $z$CCB Rule 2.17.2 deems hemp "cannabis" if >1.5mg THC/serving, >10mg THC/package (unless CBD:THC≥20:1), or it has the "market appeal of mimicking" THC intoxication — smokable flower fails these per se even at ≤0.3% total THC (6 V.S.A. §562, Δ9+0.877×THCA). Only in-state CCB-licensed cannabis establishments may sell it; Rule 2.2.15 bars purchase from unlicensed out-of-state sellers. No hemp license/fee exists. S.278 (2026) reforms only the licensed adult-use market, not hemp. [high]$z$)
+on conflict (state) do update
+  set status = excluded.status,
+      notes = excluded.notes,
+      updated_at = now();

@@ -6,6 +6,12 @@
 // email notification -> on-brand success panel. Any failure short of the
 // honeypot/time-trap checks re-enables the form with an inline error.
 import { supabase } from './supabase-client.js';
+import {
+  SUPABASE_ANON_KEY,
+  PUBLIC_SUBMIT_ENABLED,
+  PUBLIC_SUBMIT_URL,
+  TURNSTILE_SITE_KEY,
+} from './supabase-config.js';
 
 const TABLE_BY_FORM = {
   'buyer-request': 'buyer_request',
@@ -153,6 +159,66 @@ function notifyByEmail(payload, formType, flag) {
   }).then((r) => r.ok).catch(() => false);
 }
 
+// --- Phase 6: Turnstile widget + Edge Function submit path -------------------
+// All of the below is dormant unless PUBLIC_SUBMIT_ENABLED is true. When on, the
+// real submit routes through the public-submit Edge Function (Turnstile verified
+// server-side) instead of the direct anon insert; the honeypot/time-trap copies
+// also go through it (with a `flag`) so email moves to Resend and formsubmit is
+// retired.
+let turnstileScriptLoaded = false;
+function loadTurnstileScript() {
+  if (turnstileScriptLoaded) return;
+  turnstileScriptLoaded = true;
+  const s = document.createElement('script');
+  s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+  s.async = true;
+  s.defer = true;
+  document.head.appendChild(s);
+}
+
+// Injects an auto-rendering Turnstile widget just above the submit button.
+// Turnstile writes the solved token into a hidden <input name="cf-turnstile-
+// response"> inside this form, which we read at submit time.
+function mountTurnstile(form) {
+  if (form.querySelector('.cf-turnstile')) return;
+  const holder = document.createElement('div');
+  holder.className = 'cf-turnstile mhc-turnstile';
+  holder.setAttribute('data-sitekey', TURNSTILE_SITE_KEY);
+  holder.setAttribute('data-theme', 'auto');
+  const submitBtn = form.querySelector('[type="submit"]');
+  if (submitBtn && submitBtn.parentNode) {
+    submitBtn.parentNode.insertBefore(holder, submitBtn);
+  } else {
+    form.appendChild(holder);
+  }
+}
+
+function turnstileToken(form) {
+  const el = form.querySelector('[name="cf-turnstile-response"]');
+  return el ? (el.value || '') : '';
+}
+
+// POST to the public-submit Edge Function. The public anon key is sent as the
+// bearer so the request clears the functions gateway; Turnstile is the real
+// gate. Resolves on a 2xx, throws otherwise.
+async function submitViaEdge(payload, formType, { flag = '', token = '' } = {}) {
+  const res = await fetch(PUBLIC_SUBMIT_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    },
+    body: JSON.stringify({ form: formType, payload, flag, token }),
+  });
+  if (!res.ok) {
+    let msg = `submit failed (${res.status})`;
+    try { const j = await res.json(); if (j && j.error) msg = j.error; } catch (e) {}
+    throw new Error(msg);
+  }
+  return true;
+}
+
 function showSuccess(form) {
   const panel = document.createElement('div');
   panel.className = 'form-success';
@@ -183,7 +249,9 @@ function initForm(form) {
     // a real lead) but shows the bot a plain success and writes no DB row.
     const hp = form.querySelector('[name="hp"]');
     if (hp && hp.value.trim() !== '') {
-      notifyByEmail(collectPayload(form), formType, 'honeypot');
+      const flagged = collectPayload(form);
+      if (PUBLIC_SUBMIT_ENABLED) submitViaEdge(flagged, formType, { flag: 'honeypot' }).catch(() => {});
+      else notifyByEmail(flagged, formType, 'honeypot');
       showSuccess(form);
       return;
     }
@@ -191,12 +259,24 @@ function initForm(form) {
     // Time-trap — a real visitor takes more than a couple seconds to read
     // and fill the form; a bot submits near-instantly. Same flagged-copy rule.
     if (Date.now() - loadedAt < MIN_SUBMIT_MS) {
-      notifyByEmail(collectPayload(form), formType, 'time-trap');
+      const flagged = collectPayload(form);
+      if (PUBLIC_SUBMIT_ENABLED) submitViaEdge(flagged, formType, { flag: 'time-trap' }).catch(() => {});
+      else notifyByEmail(flagged, formType, 'time-trap');
       showSuccess(form);
       return;
     }
 
     if (!validateForm(form)) return;
+
+    // Phase 6: require a solved Turnstile token before we disable the button.
+    let edgeToken = '';
+    if (PUBLIC_SUBMIT_ENABLED) {
+      edgeToken = turnstileToken(form);
+      if (!edgeToken) {
+        showFormError(form, 'Please complete the verification below, then submit again.');
+        return;
+      }
+    }
 
     clearFormError(form);
     if (submitBtn) {
@@ -207,7 +287,10 @@ function initForm(form) {
     const payload = collectPayload(form);
 
     try {
-      if (supabase) {
+      if (PUBLIC_SUBMIT_ENABLED) {
+        // Turnstile-gated Edge Function does the insert + email server-side.
+        await submitViaEdge(payload, formType, { token: edgeToken });
+      } else if (supabase) {
         // DB row is the source of truth; the email copy is fire-and-forget.
         const { error } = await supabase.from(table).insert(payload);
         if (error) throw error;
@@ -231,4 +314,8 @@ function initForm(form) {
 }
 
 populateStateSelects();
-document.querySelectorAll('form[data-form]').forEach(initForm);
+if (PUBLIC_SUBMIT_ENABLED) loadTurnstileScript();
+document.querySelectorAll('form[data-form]').forEach((form) => {
+  initForm(form);
+  if (PUBLIC_SUBMIT_ENABLED) mountTurnstile(form);
+});

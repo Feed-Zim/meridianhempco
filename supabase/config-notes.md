@@ -116,3 +116,61 @@ marked **MARK** below. Everything else is automated in a session.
 - If the MCP is unavailable, the fallback is the old manual flow: paste each
   migration into the SQL Editor in order, then do steps 4–9 by hand in the
   dashboard.
+
+## Phase 6 — Turnstile + Resend hardening (BUILT 2026-07-15, dormant)
+
+Goal: move public form submits from the direct anon insert (+ formsubmit email)
+to a Turnstile-gated Edge Function that inserts via service_role and emails via
+Resend — then revoke anon INSERT entirely so the function is the only write path.
+
+**What's already built and deployed (all inert until the switch is flipped):**
+- **Edge Function `public-submit`** — deployed (version 1, `verify_jwt` on).
+  Verifies the Turnstile token server-side → whitelists exactly the anon-grant
+  columns (forces `status`/`source` to DB defaults; never stores `hp`) →
+  inserts via service_role → emails via Resend. Source:
+  `supabase/functions/public-submit/index.ts`. Smoke-tested live: OPTIONS→204
+  with CORS, unknown-form→400, unconfigured→503, no-bearer→401.
+- **Frontend (flag OFF)** — `src/assets/js/supabase-config.js` holds the public
+  `TURNSTILE_SITE_KEY` (`0x4AAAAAAD2p4L6Zax9JHtxa`), `PUBLIC_SUBMIT_URL`, and
+  `PUBLIC_SUBMIT_ENABLED = false`. `forms.js` mounts the Turnstile widget and
+  routes through the function ONLY when that flag is true; today it behaves
+  exactly as before.
+- **Revoke migration `0007_phase6_revoke_anon_insert.sql`** — staged, NOT
+  applied. Has an inline rollback block.
+
+**The two SECRETS (never in the repo, never in the browser):**
+- `TURNSTILE_SECRET` — Cloudflare Turnstile secret key (pairs with the site key).
+- `RESEND_API_KEY` — Resend API key.
+They live in the project's Edge Function secret store, injected as
+`Deno.env.get(...)`. `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` are
+auto-injected — do NOT set them.
+
+**Optional secrets:** `NOTIFY_TO` (default `deals@meridianhempco.com`),
+`NOTIFY_FROM` (default `Meridian Hemp Co <deals@meridianhempco.com>` — MUST be on
+the Resend-verified domain), `ALLOWED_ORIGINS` (CSV; default apex + www; add a
+localhost origin here temporarily if testing from a local preview).
+
+### Cutover checklist (in order — do NOT reorder)
+1. **MARK: Resend** — create the API key; add + verify the sending domain
+   (SPF/DKIM/DMARC DNS records at the registrar — allow propagation time). Pick
+   the From address (e.g. `deals@meridianhempco.com` or a `send.` subdomain) and
+   set `NOTIFY_FROM` to match the verified domain.
+2. **MARK: Turnstile** — in the same Cloudflare widget as the site key, copy the
+   **secret** key.
+3. **Set the secrets** — dashboard (Project Settings → Edge Functions → Secrets)
+   or `supabase secrets set TURNSTILE_SECRET=… RESEND_API_KEY=… NOTIFY_FROM=…`,
+   or hand them to Claude (research/.env / safe DM) to push via Management API.
+   The Supabase MCP has no secrets tool — this goes through the dashboard/CLI/API.
+4. **Flip the flag** — set `PUBLIC_SUBMIT_ENABLED = true` in supabase-config.js;
+   rebuild; sync to the deploy repo (`Feed-Zim/meridianhempco`); push → CI deploys.
+5. **Test end-to-end** — submit both forms on the live site: Turnstile renders,
+   a row lands in `farm_intake`/`buyer_request`, and the Resend email arrives.
+   Trip the honeypot/time-trap → a `[FLAGGED]` email arrives, NO row written.
+6. **Revoke anon** — only after step 5 passes, apply
+   `0007_phase6_revoke_anon_insert.sql` (MCP `apply_migration`). Now the function
+   is the sole write path. Re-test both forms once more.
+7. **Retire formsubmit** — it's no longer used in edge mode; leave the code path
+   as the automatic fallback (it re-activates if the flag is ever turned off).
+
+**Rollback:** set `PUBLIC_SUBMIT_ENABLED = false` (rebuild/deploy) and run the
+rollback block in 0007 to restore the anon grants. Direct-anon path resumes.
